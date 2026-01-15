@@ -1,0 +1,23 @@
+.site-header {
+    text-align: center;
+    border: 2px dashed red;
+}
+
+.site-header h1 {
+    border: 2px dashed purple;
+    background-color: ;
+    margin: 0 auto;
+
+}
+
+.site-header nav {
+    width: 50%;
+    border: 2px dashed blue;
+}
+
+.site-header nav ul {
+    display: flex;
+    justify-content: space-evenly;
+    border: 2px dashed green;
+
+}

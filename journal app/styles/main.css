@@ -1,0 +1,11 @@
+@import "frames/_footer.css";
+@import "frames/_header.css";
+
+@import "pages/home.css";
+@import "pages/calander.css";
+@import "pages/goals.css";
+@import "pages/about-us.css";
+
+body {
+    margin: 0 auto;
+}
