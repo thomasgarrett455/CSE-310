@@ -1,23 +1,38 @@
+:root {
+    --color: cyan;
+}
+
+
 .site-header {
     text-align: center;
-    border: 2px dashed red;
+    background-color: var(--color);
+    border-bottom: 1px black solid;
 }
 
 .site-header h1 {
-    border: 2px dashed purple;
-    background-color: ;
+    background-color: var(--color);
+    color: blue;
+    padding: 2%;
+    border-bottom: 1px solid black;
     margin: 0 auto;
+}
+
+nav {
 
 }
 
-.site-header nav {
-    width: 50%;
-    border: 2px dashed blue;
-}
-
-.site-header nav ul {
+nav ul {
     display: flex;
     justify-content: space-evenly;
-    border: 2px dashed green;
 
+}
+
+li {
+    list-style-type: none;
+    text-decoration:  none;
+    /* border: 2px dashed purple;   */
+
+    text-align: center;
+    border: 1px solid black;
+    
 }

@@ -1,0 +1,19 @@
+main {
+padding-top: 5%;
+}
+
+#aiPrompt {
+    border: 2px dashed black
+}
+
+#currGoals {
+    border: 2px dashed black
+}
+
+#journalEntries {
+    border: 2px dashed black
+}
+
+#addGoal {
+    border: 2px dashed black
+}
