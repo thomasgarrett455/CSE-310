@@ -1,0 +1,41 @@
+
+
+.calendar-page{
+
+button {
+    background-color: #c7eaff;
+    color: #003b5c;
+    width: 150px;
+    gap: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 0px solid transparent;
+}
+
+.calendarTitle {
+    border: 2px solid #003b5c;
+    margin: 5% auto;
+    text-align: center;
+    font-size: 4em;
+    background-color: white;
+    border-radius: 5px;
+}
+
+#calendar {
+    font-family: Arial, Helvetica, sans-serif;
+    height: 800px;
+    border: 2px solid #003b5c;
+    display: grid;
+    grid-template-rows: .5fr repeat(5, 1fr);
+    grid-template-columns: repeat(7 1fr);
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.day {
+    border: 1px solid black;
+}
+
+
+}
