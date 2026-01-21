@@ -2,10 +2,18 @@
 @import "frames/_header.css";
 
 @import "pages/home.css";
-@import "pages/calander.css";
+@import "pages/calendar.css";
 @import "pages/goals.css";
 @import "pages/about-us.css";
 
 body {
     margin: 0 auto;
 }
+    main {
+    padding: 3%;
+    margin: 5% 15%;
+    gap: 50px;
+    background-color: #e8f7ff;
+    border: 2px solid var(--home-border-color);
+    border-radius: 5px;
+    }

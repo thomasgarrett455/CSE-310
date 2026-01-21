@@ -1,5 +1,5 @@
 :root {
-    --border-color: #7bb7d4;
+    --header-border-color: #7bb7d4;
     --header-bg-color: #c7eaff;
     --header-text-color: #003b5c;
 }
@@ -8,7 +8,7 @@
 .site-header {
     text-align: center;
     background-color: var(--header-bg-color);
-    border-bottom: 4px solid var(--border-color);
+    border-bottom: 4px solid var(--header-border-color);
     padding: 20px;
     position: relative;
 }
@@ -17,13 +17,13 @@
     background-color: var(--header-bg-color);
     color: var(--header-text-color);
     padding: 2%;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--header-border-color);
     margin: 0 auto;
 }
 
 nav {
     background-color: var(--header-bg-color);
-    border-top: 4px solid var(--border-color);
+    border-top: 4px solid var(--header-border-color);
     margin-top: -10px;
     padding: 10px 0;
 }
@@ -38,7 +38,7 @@ nav ul {
 
 li {
     background-color: #e8f7ff;
-    border-top: 4px solid var(--border-color);
+    border-top: 4px solid var(--header-border-color);
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
     padding: 10px 20px;
