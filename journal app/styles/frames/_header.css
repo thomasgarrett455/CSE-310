@@ -19,6 +19,7 @@
     padding: 2%;
     border-bottom: 1px solid var(--header-border-color);
     margin: 0 auto;
+    font-size: 3em;
 }
 
 nav {
@@ -41,12 +42,17 @@ li {
     border-top: 4px solid var(--header-border-color);
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
-    padding: 10px 20px;
     margin-top: -8px;
+}
+
+li:hover {
+    background-color: #ffffff;
 }
 
 li a {
     text-decoration: none;
     color: var(--header-text-color);
     display: block;
+    padding: 10px 20px;
+
 }
