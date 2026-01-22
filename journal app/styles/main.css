@@ -8,8 +8,12 @@
 
 body {
     margin: 0 auto;
+    background-color: #fffaf2;
+    min-height: 800px;
 }
-    main {
+
+
+main {
     padding: 3%;
     margin: 5% 15%;
     gap: 50px;
