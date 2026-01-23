@@ -19,6 +19,8 @@ builder.Services.AddCors(options =>
       });
 });
 
+builder.Services.AddScoped<IJournalService, JournalService>();
+
 var app = builder.Build();
 
 app.UseHttpsRedirection();

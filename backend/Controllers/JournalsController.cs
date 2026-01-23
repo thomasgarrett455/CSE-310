@@ -10,26 +10,25 @@ namespace JournalApi.Controllers;
 [Route("api/journals")]
 public class JournalsController : ControllerBase
 {
-    private readonly JournalDbContext _db;
+    private readonly IJournalService _service;
 
-    public JournalsController(JournalDbContext db)
+    public JournalsController(IJournalService service)
     {
-        _db = db;
+        _service = service;
     }
 
     // GET: api/journals
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var journals = await _db.JournalEntries.ToListAsync();
-        return Ok(journals);
+        return Ok(await _service.GetAllAsync());
     }
 
     // GET: api/journals/{id}
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
-        var entry = await _db.JournalEntries.FindAsync(id);
+        var entry = await _service.GetByIdAsync(id);
         if (entry == null)
             return NotFound(new { message = "Journal entry not found" });
 
@@ -38,35 +37,20 @@ public class JournalsController : ControllerBase
 
     // POST: api/journals
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateJournalDto dto)
+    public async Task<IActionResult> Create(CreateJournalDto dto)
     {
         // Model validation automatically runs due to [ApiController]
-        var entry = new JournalEntry
-        {
-            Title = dto.Title,
-            Content = dto.Content,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _db.JournalEntries.Add(entry);
-        await _db.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(Get), new { id = entry.Id }, entry);
+        var entry = await _service.CreateAsync(dto.Title, dto.Content);
+return CreatedAtAction(nameof(Get), new { id = entry.Id }, entry);
     }
 
     // PUT: api/journals/{id}
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdateJournalDto dto)
+    public async Task<IActionResult> Update(int id, UpdateJournalDto dto)
     {
-        var entry = await _db.JournalEntries.FindAsync(id);
+        var entry = await _service.UpdateAsync(id, dto.Title, dto.Content);
         if (entry == null)
             return NotFound(new { message = "Journal entry not found" });
-
-        entry.Title = dto.Title;
-        entry.Content = dto.Content;
-
-        await _db.SaveChangesAsync();
-
         return Ok(entry);
     }
 
@@ -74,13 +58,9 @@ public class JournalsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var entry = await _db.JournalEntries.FindAsync(id);
-        if (entry == null)
+        var deleted = await _service.DeleteAsync(id);
+        if (!deleted)
             return NotFound(new { message = "Journal entry not found" });
-
-        _db.JournalEntries.Remove(entry);
-        await _db.SaveChangesAsync();
-
         return NoContent();
     }
 }
