@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using JournalApi.Models;
+using JournalApi.Models.DTOs;
 using JournalApi.Data;
 
 namespace JournalApi.Controllers;
@@ -8,63 +10,77 @@ namespace JournalApi.Controllers;
 [Route("api/journals")]
 public class JournalsController : ControllerBase
 {
-  private readonly JournalDbContext _db;
+    private readonly JournalDbContext _db;
 
-  public JournalsController(JournalDbContext db)
-  {
-    _db = db;
-  }
+    public JournalsController(JournalDbContext db)
+    {
+        _db = db;
+    }
 
-  [HttpGet]
-  public IActionResult GetAll()
-  {
-    return Ok(_db.JournalEntries.ToList());
-  }
+    // GET: api/journals
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var journals = await _db.JournalEntries.ToListAsync();
+        return Ok(journals);
+    }
 
-  [HttpGet("{id}")]
-  public IActionResult Get(int id)
-  {
-    var entry = _db.JournalEntries.Find(id);
-    if (entry == null)
-        return NotFound();
-      
-    return Ok(entry);
-  }
+    // GET: api/journals/{id}
+    [HttpGet("{id}")]
+    public async Task<IActionResult> Get(int id)
+    {
+        var entry = await _db.JournalEntries.FindAsync(id);
+        if (entry == null)
+            return NotFound(new { message = "Journal entry not found" });
 
-  [HttpPost]
-  public IActionResult Create(JournalEntry entry)
-  {
-    _db.JournalEntries.Add(entry);
-    _db.SaveChanges();
+        return Ok(entry);
+    }
 
-    return CreatedAtAction(nameof(Get), new { id = entry.Id }, entry);
-  }
+    // POST: api/journals
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreateJournalDto dto)
+    {
+        // Model validation automatically runs due to [ApiController]
+        var entry = new JournalEntry
+        {
+            Title = dto.Title,
+            Content = dto.Content,
+            CreatedAt = DateTime.UtcNow
+        };
 
-  [HttpPut("{id}")]
-  public IActionResult Update(int id, JournalEntry updated)
-  {
-    var entry = _db.JournalEntries.Find(id);
-    if (entry == null)
-        return NotFound();
-      
-    entry.Title = updated.Title;
-    entry.Content = updated.Content;
+        _db.JournalEntries.Add(entry);
+        await _db.SaveChangesAsync();
 
-    _db.SaveChanges();
-    return Ok(entry);
-  }
+        return CreatedAtAction(nameof(Get), new { id = entry.Id }, entry);
+    }
 
-  [HttpDelete("{id}")]
-  public IActionResult Delete(int id)
-  {
-    var entry = _db.JournalEntries.Find(id);
-    if (entry == null) 
-        return NotFound();
-      
-    _db.JournalEntries.Remove(entry);
-    _db.SaveChanges();
+    // PUT: api/journals/{id}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateJournalDto dto)
+    {
+        var entry = await _db.JournalEntries.FindAsync(id);
+        if (entry == null)
+            return NotFound(new { message = "Journal entry not found" });
 
-    return NoContent();
-  }
+        entry.Title = dto.Title;
+        entry.Content = dto.Content;
 
+        await _db.SaveChangesAsync();
+
+        return Ok(entry);
+    }
+
+    // DELETE: api/journals/{id}
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var entry = await _db.JournalEntries.FindAsync(id);
+        if (entry == null)
+            return NotFound(new { message = "Journal entry not found" });
+
+        _db.JournalEntries.Remove(entry);
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

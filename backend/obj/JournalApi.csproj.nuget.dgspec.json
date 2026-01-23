@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/camwoodward/JournalApi/backend/JournalApi.csproj": {}
+    "/Users/camwoodward/Downloads/CSE310/CSE-310/backend/JournalApi.csproj": {}
   },
   "projects": {
-    "/Users/camwoodward/JournalApi/backend/JournalApi.csproj": {
+    "/Users/camwoodward/Downloads/CSE310/CSE-310/backend/JournalApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/camwoodward/JournalApi/backend/JournalApi.csproj",
+        "projectUniqueName": "/Users/camwoodward/Downloads/CSE310/CSE-310/backend/JournalApi.csproj",
         "projectName": "JournalApi",
-        "projectPath": "/Users/camwoodward/JournalApi/backend/JournalApi.csproj",
+        "projectPath": "/Users/camwoodward/Downloads/CSE310/CSE-310/backend/JournalApi.csproj",
         "packagesPath": "/Users/camwoodward/.nuget/packages/",
-        "outputPath": "/Users/camwoodward/JournalApi/backend/obj/",
+        "outputPath": "/Users/camwoodward/Downloads/CSE310/CSE-310/backend/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/camwoodward/.nuget/NuGet/NuGet.Config"
