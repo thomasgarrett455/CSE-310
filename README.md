@@ -9,7 +9,7 @@ A journaling application that uses a html,css,js front end and c# with a sql dat
 ## Software Features
 
 * [ ] AI to create journal entry prompt
-* [ ] Second feature here
+* [ ] Robust database to store entries and user data
 * [ ] Keep going ....
 * [ ] 
 
