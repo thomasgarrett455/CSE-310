@@ -6,7 +6,6 @@ Thomas Garrett, Danile Wahlquist, Cam Woodward, Jack Murdock
 A journaling application that uses a html,css,js front end and c# with a sql database to store journal entries and goals.
 
 ## Architecture
-<img width="831" height="659" alt="image" src="https://github.com/user-attachments/assets/494bcbb0-8108-4cd9-84b4-ab3378b963a9" />
 
 ## Software Features
 
