@@ -1,4 +1,3 @@
-<img width="1462" height="540" alt="image" src="https://github.com/user-attachments/assets/c7716620-d5c3-4586-a785-1cb40f704a20" /># Project Title
 AI Journal APP
 ## Team Members
 Thomas Garrett, Danile Wahlquist, Cam Woodward, Jack Murdock
