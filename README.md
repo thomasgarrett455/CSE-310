@@ -1,10 +1,12 @@
-# Project Title
+<img width="1462" height="540" alt="image" src="https://github.com/user-attachments/assets/c7716620-d5c3-4586-a785-1cb40f704a20" /># Project Title
 AI Journal APP
 ## Team Members
 Thomas Garrett, Danile Wahlquist, Cam Woodward, Jack Murdock
 ## Software Description
 A journaling application that uses a html,css,js front end and c# with a sql database to store journal entries and goals.
+
 ## Architecture
+<img width="831" height="659" alt="image" src="https://github.com/user-attachments/assets/494bcbb0-8108-4cd9-84b4-ab3378b963a9" />
 
 ## Software Features
 
