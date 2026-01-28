@@ -11,11 +11,13 @@
     --secondary-color: #7889b7;
     --third-color: #C3C3C3;
     --fourth-color: #190E4F;
+}
 
-    --dark-main-color: ;
-    --dark-secondary-color: ;
-    --dark-third-color: ;
-    --dark-fourth-color: ;
+.dark {
+    --main-color: #342E37;
+    --secondary-color: #4B4B4B;
+    --third-color: #B0B0B0;
+    --fourth-color: #FFFFFF;
 }
 
 
