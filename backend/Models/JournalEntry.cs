@@ -22,4 +22,11 @@ public class JournalEntry
 
   [ForeignKey("UserId")]
   public ApplicationUser? User { get; set; }
+  public bool IsDeleted { get; set; } = false;
+  public DateTime? DeletedAt { get; set; }
+
+  public int? CategoryId { get; set; }
+  public Category? Category { get; set; }
+
+  public List<Tag> Tags { get; set; } = new();
 }

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace JournalApi.Controllers;
 using System.Security.Claims;
 
-
+ 
 [Authorize]
 [ApiController]
 [Route("api/journals")]
@@ -25,10 +25,19 @@ public class JournalsController : ControllerBase
 
     // GET: api/journals
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int page =  1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] string? search,
+        [FromQuery] string sort = "created_desc",
+        [FromQuery] int page =  1, 
+        [FromQuery] int pageSize = 10)
     {
         var userId = GetUserId();
-        var entries = await _service.GetAllAsync(userId, page, pageSize);
+        var entries = await _service.GetAllAsync(
+            userId, 
+            search, 
+            sort,
+            page, 
+            pageSize);
         return Ok(entries);
     }
 
@@ -45,29 +54,34 @@ public class JournalsController : ControllerBase
 
     // POST: api/journals
     [HttpPost]
-    public async Task<IActionResult> Create(CreateJournalDto dto)
+    public async Task<IActionResult> Create(CreateJournalWithMetaDto dto)
     {
         var userId = GetUserId();
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         // Model validation automatically runs due to [ApiController]
-        var entry = await _service.CreateAsync(dto.Title, dto.Content, userId);
-        return CreatedAtAction(nameof(Get), new { id = entry.Id }, entry);
+        var journal = await _service.CreateAsync(dto.Title, dto.Content, dto.CategoryId, dto.Tags, userId);
+        return CreatedAtAction(nameof(Get), new { id = journal.Id }, journal);
     }
 
     // PUT: api/journals/{id}
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateJournalDto dto, string userId)
+    public async Task<IActionResult> Update(int id, UpdateJournalWithMetaDto dto)
     {
+        var userId = GetUserId();
 
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-        var entry = await _service.UpdateAsync(id, dto.Title, dto.Content, userId);
-        if (entry == null)
+        var journal = await _service.UpdateAsync(id, dto.Title, dto.Content, dto.CategoryId, dto.Tags, userId);
+        if (journal == null)
             return NotFound(new { message = "Journal entry not found" });
-        return Ok(entry);
+        return Ok(journal);
+    }
+
+    [HttpGet("count")]
+    public async Task<IActionResult> GetCount([FromQuery] string? search)
+    {
+        var userId = GetUserId();
+        var count = await _service.GetCountAsync(userId, search);
+        return Ok(new { total = count });
     }
 
     // DELETE: api/journals/{id}
@@ -78,5 +92,24 @@ public class JournalsController : ControllerBase
         if (!deleted)
             return NotFound(new { message = "Journal entry not found" });
         return NoContent();
+    }
+
+    [HttpPost("{id}/restore")]
+    public async Task<IActionResult> Restore(int id)
+    {
+        var userId = GetUserId();
+        var restored = await _service.RestoreAsync(id, userId);
+
+        if (!restored) 
+            return NotFound(new { message = "Journal not found" });
+
+        return NoContent();
+    }
+
+    [HttpGet("trash")]
+    public async Task<ActionResult> GetTrash()
+    {
+        var userId = GetUserId();
+        return Ok(await _service.GetDeletedAsync(userId));
     }
 }
