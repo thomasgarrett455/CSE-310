@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calander</title>
     <link rel="stylesheet" href="styles/main.css">
+    <script src="scripts/main.js" defer></script>
+    <script>
+        const saved = localStorage.getItem("theme");
+        if (saved === "1") {
+            document.documentElement.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+        }
+    </script>
+    <script src="scripts/calendar.js" defer></script>
 </head>
 <body class="calendar-page">
     <header class="site-header">
@@ -21,14 +31,22 @@
         </nav>
     </header>
     <main>
-        <button>Day</button>
-        <button>Month</button>
-        <button>Year</button>
+        <input type="month" class="calendar-dropdown">
 
-        <section class="calendarTitle">2026</section>
+
+        <section class="calendarTitle">
+            <button><</button>
+            2026
+            <button>></button>
+        </section>
         <section id="calendar">
-            <div class="day"></div>
-
+            <div class="weekday">Sunday</div>
+            <div class="weekday">Monday</div>
+            <div class="weekday">Tuesday</div>
+            <div class="weekday">Wednesday</div>
+            <div class="weekday">Thursday</div>
+            <div class="weekday">Friday</div>
+            <div class="weekday">Saturday</div>
         </section>
     </main>
         <footer class="site-footer">

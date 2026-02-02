@@ -7,17 +7,17 @@
 @import "pages/about-us.css";
 
 :root {
-    --main-color: #5E5D5F;
+    --main-color: #4C5C8C;
     --secondary-color: #7889b7;
-    --third-color: #C3C3C3;
+    --third-color: #B0B0B0;
     --fourth-color: #190E4F;
 }
 
 .dark {
-    --main-color: #342E37;
-    --secondary-color: #4B4B4B;
-    --third-color: #B0B0B0;
-    --fourth-color: #FFFFFF;
+    --main-color: #2c2c2c;
+    --secondary-color: #3e3e3e;
+    --third-color: #1e1e1e;
+    --fourth-color: #B0B0B0;
 }
 
 
