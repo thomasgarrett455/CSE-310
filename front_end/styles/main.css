@@ -7,11 +7,13 @@
 @import "pages/about-us.css";
 
 :root {
-    --main-color: #4C5C8C;
-    --secondary-color: #7889b7;
-    --third-color: #B0B0B0;
+    --main-color: #7889b7;
+    --secondary-color: #B0B0B0;
+    --third-color: #4E3A28;
     --fourth-color: #190E4F;
 }
+
+/* {#2A3A6A}; */
 
 .dark {
     --main-color: #2c2c2c;
@@ -26,6 +28,8 @@ body {
     margin: 0 auto;
     background-color: var(--main-color);
     min-height: 800px;
+    font-family: Cochin, Times, 'Times New Roman', serif;
+
 }
 
 
