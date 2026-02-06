@@ -1,16 +1,22 @@
 using JournalApi.Models;
 using JournalApi.Models.DTOs;
+using JournalApi.Models.Common;
 
 public interface IJournalService
 {
-  Task<List<JournalDto>> GetAllAsync(
+  Task<PagedResult<JournalDto>> GetAllAsync(
     string userId, 
-    string? search, 
-    string sort,
-    int page = 1, 
-    int pageSize = 10);
+    int page, 
+    int pageSize,
+    int? tagId = null,
+    int? categoryId = null);
   Task<JournalDto?> GetByIdAsync(int id, string userId);
-  Task<JournalDto> CreateAsync(string title, string content, int? categoryId, List<string> tags, string userId);
+  Task<JournalDto> CreateAsync(
+    string title, 
+    string content, 
+    List<int> tagIds, 
+    List<int> categoryIds, 
+    string userId);
   Task<JournalDto?> UpdateAsync(int id, string title, string content, int? categoryId, List<string> tags, string userId);
   Task<int> GetCountAsync(string userId, string? search);
   Task<bool> DeleteAsync(int id, string userId);

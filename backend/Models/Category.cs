@@ -4,10 +4,13 @@ namespace JournalApi.Models;
 
 public class Category
 {
-  public int Id { get; set; }
+    public int Id { get; set; }
 
-  [Required]
-  public string Name { get; set; } = string.Empty;
-  public string UserId { get; set; } = string.Empty;
-  public List<JournalEntry> Journals { get; set; } = new();
+    [Required]
+    public string Name { get; set; } = string.Empty;
+
+    public string UserId { get; set; } = string.Empty;
+
+    // Optional: list of journals in this category
+    public List<JournalEntry> Journals { get; set; } = new();
 }

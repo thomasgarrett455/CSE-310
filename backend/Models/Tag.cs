@@ -11,5 +11,5 @@ public class Tag
   public string UserId { get; set; } = string.Empty;
 
   public List<JournalEntry> Journals { get; set; } = new();
-  
+
 }

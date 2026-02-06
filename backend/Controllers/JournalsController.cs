@@ -29,15 +29,19 @@ public class JournalsController : ControllerBase
         [FromQuery] string? search,
         [FromQuery] string sort = "created_desc",
         [FromQuery] int page =  1, 
-        [FromQuery] int pageSize = 10)
-    {
+        [FromQuery] int pageSize = 10,
+        [FromQuery] int? categoryId = null,
+        [FromQuery] List<int>? tagIds = null)
+            {
         var userId = GetUserId();
         var entries = await _service.GetAllAsync(
             userId, 
             search, 
             sort,
             page, 
-            pageSize);
+            pageSize,
+            categoryId,
+            tagIds);
         return Ok(entries);
     }
 

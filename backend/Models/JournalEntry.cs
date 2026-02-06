@@ -28,5 +28,8 @@ public class JournalEntry
   public int? CategoryId { get; set; }
   public Category? Category { get; set; }
 
+  public List<JournalTag> JournalTags { get; set; } = new();
+  public List<JournalCategory> JournalCategories { get; set; } = new();
+
   public List<Tag> Tags { get; set; } = new();
 }

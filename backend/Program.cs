@@ -9,6 +9,8 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ITagService, TagService>();
 
 builder.Services.AddDbContext<JournalDbContext>(options => options.UseSqlite("Data Source=journal.db"));
 
