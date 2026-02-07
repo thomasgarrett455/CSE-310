@@ -69,4 +69,15 @@ document.getElementById("return").addEventListener("click", () => {
     updateCalendar();
 })
 
+const monthInput = document.querySelector(".calendar-dropdown");
+
+monthInput.addEventListener("change", () => {
+    const [year, month] = monthInput.value.split("-");
+    currentYear = Number(year)
+    currentMonth = Number(month) - 1
+    updateCalendar()
+
+});
+
+
 updateCalendar();
