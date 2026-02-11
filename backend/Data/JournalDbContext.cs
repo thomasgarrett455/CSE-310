@@ -23,11 +23,32 @@ public class JournalDbContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
-        // Many-to-many between JournalEntry and Tag
-        builder.Entity<JournalEntry>()
-            .HasMany(j => j.Tags)
-            .WithMany(t => t.Journals);
+        builder.Entity<JournalTag>()
+            .HasKey(jt => new { jt.JournalEntryId, jt.TagId });
 
+        
+        builder.Entity<JournalTag>()
+            .HasOne(jt => jt.JournalEntry)
+            .WithMany(j => j.JournalTags)
+            .HasForeignKey(jt => jt.JournalEntryId);
+        
+        builder.Entity<JournalTag>()
+            .HasOne(jt => jt.Tag)
+            .WithMany(t => t.JournalTags)
+            .HasForeignKey(jt => jt.TagId);
+
+        builder.Entity<JournalCategory>()
+            .HasKey (jc => new { jc.JournalEntryId, jc.CategoryId });
+
+        builder.Entity<JournalCategory>()
+            .HasOne(jc => jc.JournalEntry)
+            .WithMany(j => j.JournalCategories)
+            .HasForeignKey(jc => jc.JournalEntryId);
+        
+        builder.Entity<JournalCategory>()
+            .HasOne(jc => jc.Category)
+            .WithMany(c => c.JournalCategories)
+            .HasForeignKey(jc => jc.CategoryId);
         // One-to-many between Category and JournalEntry
         builder.Entity<Category>()
             .HasMany(c => c.Journals)
@@ -35,11 +56,7 @@ public class JournalDbContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(j => j.CategoryId)
             .OnDelete(DeleteBehavior.SetNull); // optional: keeps journals if category deleted
 
-        builder.Entity<JournalTag>()
-            .HasKey(jt => new { jt.JournalEntryId, jt.TagId });
 
     
-        builder.Entity<JournalCategory>()
-            .HasKey (jc => new { jc.JournalEntryId, jc.CategoryId });
     }
 }

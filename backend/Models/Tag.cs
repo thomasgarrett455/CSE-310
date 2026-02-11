@@ -10,6 +10,6 @@ public class Tag
   public string Name { get; set; } = string.Empty;
   public string UserId { get; set; } = string.Empty;
 
-  public List<JournalEntry> Journals { get; set; } = new();
+  public List<JournalTag> JournalTags { get; set; } = new();
 
 }

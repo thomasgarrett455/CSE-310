@@ -1,7 +1,6 @@
 using JournalApi.Data;
 using JournalApi.Models;
 using JournalApi.Models.DTOs;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using JournalApi.Models.Common;
 
@@ -9,31 +8,56 @@ public class JournalService : IJournalService
 {
     private readonly JournalDbContext _db;
     
-    private JournalDto MapToDto(JournalEntry j)
-    {
-        return new JournalDto
-        {
-            Id = j.Id,
-            Title = j.Title,
-            Content = j.Content,
-            CreatedAt = j.CreatedAt
-        };
-    } 
-
     public JournalService(JournalDbContext db)
     {
         _db = db;
     }
-
+    private JournalDto MapToDto(JournalEntry journal)
+    {
+        return new JournalDto
+        {
+            Id = journal.Id,
+            Title = journal.Title,
+            Content = journal.Content,
+            CreatedAt = journal.CreatedAt,
+            Tags = journal.JournalTags
+                .Select(jt => new TagDto
+                {
+                    Id = jt.TagId,
+                    Name = jt.Tag.Name
+                }).ToList(),
+            Categories = journal.JournalCategories
+                .Select(jc => new CategoryDto
+                {
+                    Id = jc.CategoryId,
+                    Name = jc.Category.Name
+                }).ToList()
+        };
+    } 
     public async Task<PagedResult<JournalDto>> GetAllAsync(
         string userId, 
+        int sort,
         int page, 
         int pageSize,
         int? tagId = null,
-        int? categoryId = null)
+        int? categoryId = null,
+        string? search = null)
     {
         var query = _db.JournalEntries
+            .Include(j => j.JournalTags)
+                .ThenInclude(jt => jt.Tag)
+            .Include(j => j.JournalCategories)
+                .ThenInclude(jc => jc.Category)
             .Where (j => j.UserId == userId && !j.IsDeleted);
+
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var lowerSearch = search.ToLower();
+            query = query.Where(j =>
+                EF.Functions.Like(j.Title.ToLower(), $"%{lowerSearch}%") ||
+                EF.Functions.Like(j.Content.ToLower(), $"%{lowerSearch}%"));
+        }
 
         if (tagId.HasValue)
         {
@@ -45,7 +69,9 @@ public class JournalService : IJournalService
             query = query.Where(j => j.JournalCategories.Any(c => c.CategoryId == categoryId));
         }
 
+
         var total = await query.CountAsync();
+
         var journals = await query
             .OrderByDescending(j => j.CreatedAt)
             .Skip((page - 1) * pageSize)
@@ -55,7 +81,7 @@ public class JournalService : IJournalService
         return new PagedResult<JournalDto>
         {
             Items = journals.Select(MapToDto).ToList(),
-            totalCount = total  
+            TotalCount = total  
         };
 
     }
@@ -63,46 +89,40 @@ public class JournalService : IJournalService
     public async Task<JournalDto?> GetByIdAsync(int id, string userId)
     {
         var entry = await _db.JournalEntries
+            .Include(j => j.JournalTags).ThenInclude(jt => jt.Tag)
+            .Include(j => j.JournalCategories).ThenInclude(jc => jc.Category)
             .FirstOrDefaultAsync(j => j.Id == id && j.UserId == userId && !j.IsDeleted);
-        if (entry == null) return null;
 
-        return new JournalDto
-        {
-            Id = entry.Id,
-            Title = entry.Title,
-            Content = entry.Content,
-            CreatedAt = entry.CreatedAt
-        };
+            return entry == null ? null : MapToDto(entry);
+    
     }
 
     public async Task<JournalDto> CreateAsync(
-        string title, 
-        string content, 
-        List<int> tagIds,
-        List<int> categoryIds,
+        CreateJournalDto dto,
         string userId)
     {
         var journal = new JournalEntry
         {
-            Title = title,
-            Content = content,
+            Title = dto.Title,
+            Content = dto.Content,
             UserId = userId,
             CreatedAt = DateTime.UtcNow
         };
 
-        foreach (var tagId in tagIds)
-        {
-            journal.JournalTags.Add(new JournalTag
-            {
-                TagId = tagId
-            });
-        }
-
-        foreach (var catgegoryId in categoryIds)
+        foreach (var categoryId in dto.CategoryIds.Distinct())
         {
             journal.JournalCategories.Add(new JournalCategory
             {
-                CategoryId = catgegoryId
+                CategoryId = categoryId
+            });
+        }
+
+        foreach (var tagId in dto.TagIds.Distinct())
+        {
+        
+            journal.JournalTags.Add(new JournalTag
+            {
+                TagId = tagId
             });
         }
     
@@ -115,74 +135,59 @@ public class JournalService : IJournalService
 
     public async Task<JournalDto?> UpdateAsync(
         int id, 
-        string title, 
-        string content,
-        int? categoryId,
-        List<string> tags, 
+        UpdateJournalDto dto,
         string userId)
     {
         var journal = await _db.JournalEntries
+            .Include(j => j.JournalTags)
+            .Include(j => j.JournalCategories)
             .FirstOrDefaultAsync(j => j.Id == id && j.UserId == userId);
 
         if (journal == null) return null;
 
-        journal.Title = title;
-        journal.Content = content;
-        journal.CategoryId = categoryId;
+        journal.Title = dto.Title;
+        journal.Content = dto.Content;
 
-        journal.Tags.Clear();
-
-        foreach (var tagName in tags.Distinct())
+        journal.JournalCategories.Clear();
+        foreach (var categoryId in dto.CategoryIds.Distinct())
         {
-            var existingTag = await _db.Tags
-                .FirstOrDefaultAsync(t =>
-                    t.Name == tagName &&
-                    t.UserId == userId);
-            
-            if (existingTag == null)
-            {
-                existingTag = new Tag
-                {
-                    Name = tagName,
-                    UserId = userId
-                };
+            journal.JournalCategories.Add(new JournalCategory { CategoryId = categoryId });
+        }
 
-                _db.Tags.Add(existingTag);
-            }
-
-            journal.Tags.Add(existingTag);
+        journal.JournalTags.Clear();
+        foreach (var tagId in dto.TagIds.Distinct())
+        {
+            journal.JournalTags.Add(new JournalTag { TagId = tagId });
         }
 
         await _db.SaveChangesAsync();
         return MapToDto(journal);
-    
     }
 
-    public async Task<int> GetCountAsync(string userId, string? search)
+    public async Task<int> GetCountAsync(string userId, string? search = null)
+{
+    var query = _db.JournalEntries.Where(j => j.UserId == userId && !j.IsDeleted);
+
+    if (!string.IsNullOrWhiteSpace(search))
     {
-        IQueryable<JournalEntry> query = _db.JournalEntries.Where(j => j.UserId == userId && !j.IsDeleted);
-
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            query = query.Where(j =>
-                j.Title.Contains(search) ||
-                j.Content.Contains(search));
-        }
-
-        return await query.CountAsync();
+        var lowerSearch = search.ToLower();
+        query = query.Where(j =>
+            EF.Functions.Like(j.Title.ToLower(), $"%{lowerSearch}%") ||
+            EF.Functions.Like(j.Content.ToLower(), $"%{lowerSearch}%"));
     }
+
+    return await query.CountAsync();
+}
 
     public async Task<bool> DeleteAsync(int id, string userId)
     {
         var entry = await _db.JournalEntries
             .FirstOrDefaultAsync(j => j.Id == id && j.UserId == userId);
-
         if (entry == null) return false;
 
         entry.IsDeleted = true;
         entry.DeletedAt = DateTime.UtcNow;
 
-        _db.JournalEntries.Remove(entry);
         await _db.SaveChangesAsync();
         return true;
     }

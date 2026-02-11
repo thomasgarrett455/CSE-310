@@ -27,7 +27,7 @@ public class CategoriesController : ControllerBase
   [HttpPost]
   public async Task<IActionResult> Create(CreateCategoryDto dto)
   {
-    var category = await _service.CreateAsync(dto.Name, GetUserId());
+    var category = await _service.CreateAsync(dto, GetUserId());
     return Ok(category);
   }
 

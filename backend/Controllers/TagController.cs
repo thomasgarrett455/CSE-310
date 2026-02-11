@@ -5,7 +5,7 @@ using JournalApi.Models.DTOs;
 
 [Authorize]
 [ApiController]
-[Route("api/categories")]
+[Route("api/tags")]
 public class TagsController : ControllerBase
 {
   private ITagService _service;
@@ -21,11 +21,12 @@ public class TagsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
   {
-    return Ok(await _service.GetAllAsync(GetUserId()));
+    List<TagDto> tags = await _service.GetAllAsync(GetUserId());
+    return Ok(tags);
   }
 
   [HttpPost]
-  public async Task<IActionResult> Create(CreateCategoryDto dto)
+  public async Task<IActionResult> Create(CreateTagDto dto)
   {
     var tag = await _service.CreateAsync(dto.Name, GetUserId());
     return Ok(tag);

@@ -25,11 +25,11 @@ public class CategoryService : ICategoryService
       .ToListAsync();
   }
 
-  public async Task<CategoryDto> CreateAsync(string name, string userId)
+  public async Task<CategoryDto> CreateAsync(CreateCategoryDto dto, string userId)
   {
     var category = new Category
     {
-      Name = name,
+      Name = dto.Name,
       UserId = userId
     };
 

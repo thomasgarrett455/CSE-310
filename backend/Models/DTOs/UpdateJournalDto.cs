@@ -4,12 +4,12 @@ namespace JournalApi.Models.DTOs;
 
 public class UpdateJournalDto
 {
-  [Required]
-  [MaxLength(100)]
+  [Required(ErrorMessage = "Title is required")]
+  [MaxLength(100, ErrorMessage = "Title cannot exceed 100 characters")]
   public string Title { get; set; } = string.Empty;
 
-  [Required]
-  [MaxLength(2000)]
+  [Required(ErrorMessage = "Content is required")]
+  [MaxLength(2000, ErrorMessage = "Content cannot exceed 2000 characters")]
   public string Content { get; set; } = string.Empty;
 
   public List<int> TagIds { get; set; } = new();

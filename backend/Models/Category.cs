@@ -11,6 +11,6 @@ public class Category
 
     public string UserId { get; set; } = string.Empty;
 
-    // Optional: list of journals in this category
-    public List<JournalEntry> Journals { get; set; } = new();
+    public List<JournalCategory> JournalCategories { get; set; } = new();
+
 }
