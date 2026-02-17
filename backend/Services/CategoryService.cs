@@ -43,6 +43,47 @@ public class CategoryService : ICategoryService
     };
   }
 
+  public async Task<CategoryDto?> UpdateAsync(int id, UpdateCategoryDto dto, string userId)
+  {
+    var category = await _db.Categories
+      .Include(c => c.JournalCategories)
+      .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
+
+    if (category == null) return null;
+
+    var existingCategory = await _db.Categories
+      .Include(c => c.JournalCategories)
+      .FirstOrDefaultAsync(c => c.UserId == userId && c.Name == dto.Name && c.Id != id);
+    
+    if (existingCategory != null)
+    {
+      var journalCategories = await _db.JournalCategories
+        .Where(jc => jc.CategoryId == id)
+        .ToListAsync();
+
+      
+      foreach (var jc in journalCategories)
+      {
+        if (!await _db.JournalCategories.AnyAsync(x => x.JournalEntryId == jc.JournalEntryId && x.CategoryId == existingCategory.Id))
+        {
+          jc.CategoryId = existingCategory.Id;
+        }
+        else
+        {
+          _db.JournalCategories.Remove(jc);
+        }
+      }
+      _db.Categories.Remove(category);
+      await _db.SaveChangesAsync();
+
+      return new CategoryDto { Id = existingCategory.Id, Name = existingCategory.Name };
+    }
+    category.Name = dto.Name;
+    await _db.SaveChangesAsync();
+
+    return new CategoryDto { Id = category.Id, Name = category.Name };
+  }
+
   public async Task<bool> DeleteAsync(int id, string userId)
   {
     var category = await _db.Categories

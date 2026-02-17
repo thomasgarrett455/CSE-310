@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using JournalApi.Models;
 using JournalApi.Models.DTOs;
+using JournalApi.Services;
 using JournalApi.Data;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using JournalApi.Models.Common;
 namespace JournalApi.Controllers
 {
     [Authorize]
@@ -25,7 +27,7 @@ namespace JournalApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? search,
-            [FromQuery] int sort = 0,
+            [FromQuery] JournalSort sort = JournalSort.CreatedAtDesc,
             [FromQuery] int page =  1, 
             [FromQuery] int pageSize = 10,
             [FromQuery] int? categoryId = null,
@@ -47,8 +49,9 @@ namespace JournalApi.Controllers
 
         // GET: api/journals/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id, string userId)
+        public async Task<IActionResult> Get(int id)
         {
+            var userId = GetUserId();
             var entry = await _service.GetByIdAsync(id, userId);
             if (entry == null)
                 return NotFound(new { message = "Journal entry not found" });
@@ -82,18 +85,31 @@ namespace JournalApi.Controllers
         }
 
         [HttpGet("count")]
-        public async Task<IActionResult> GetCount([FromQuery] string? search)
+        public async Task<IActionResult> GetCount([FromQuery] string? search = null)
         {
             var userId = GetUserId();
-            var count = await _service.GetCountAsync(userId, search);
-            return Ok(new { total = count });
+            var totalJournals = await _service.GetTotalJournalsAsync(userId);
+            int count;
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                
+            count = await _service.GetCountAsync(userId, search);
+            } else
+            {
+                count = totalJournals;
+            }
+
+            var deletedCount = await _service.GetDeletedCountAsync(userId);
+            
+            return Ok(new { total = count, deleted = deletedCount });
         }
 
         // DELETE: api/journals/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id, string userId)
+        public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _service.DeleteAsync(id, userId);
+            var userId = GetUserId();
+            var deleted = await _service.SoftDeleteAsync(id, userId);
             if (!deleted)
                 return NotFound(new { message = "Journal entry not found" });
             return NoContent();
@@ -115,7 +131,60 @@ namespace JournalApi.Controllers
         public async Task<ActionResult> GetTrash()
         {
             var userId = GetUserId();
-            return Ok(await _service.GetDeletedAsync(userId));
+            var trashed = await _service.GetDeletedCountAsync(userId);
+
+            return Ok(trashed);
+        }
+
+        [HttpGet("analytics/summary")]
+        public async Task<IActionResult> GetAnalytics()
+        {
+            var userId = GetUserId();
+
+            var totalJournals = await _service.GetTotalJournalsAsync(userId);
+            var deletedJournals = await _service.GetDeletedCountAsync(userId);
+            var topTags = await _service.GetMostUsedTagsAsync(userId);
+            var topCategories = await _service.GetMostUsedCategoriesAsync(userId);
+
+            return Ok(new
+            {
+                TotalJournals = totalJournals,
+                DeletedJournals = deletedJournals,
+                TopTags = topTags,
+                TopCategories = topCategories
+            });
+        }
+
+        [HttpGet("analytics/monthly")]
+        public async Task<IActionResult> GetMonthlyCount([FromQuery] int year)
+        {
+            var userId = GetUserId();
+            var data = await _service.GetMonthlyJournalCountsAsync(userId, year);
+            return Ok(data);
+        }
+
+        [HttpGet("analytics/yearly")]
+        public async Task<IActionResult> GetYearlyCounts()
+        {
+            var userId = GetUserId();
+            var data = await _service.GetYearlyJournalCountsAsync(userId);
+            return Ok(data);
+        }
+
+        [HttpGet("analytics/dow")]
+        public async Task<IActionResult> GetJournalsByDayOfWeek()
+        {
+            var userId = GetUserId();
+            var data = await _service.GetJournalsByDayOfWeekAsync(userId);
+            return Ok(data);
+        }
+
+        [HttpGet("analytics/hourly")]
+        public async Task<IActionResult> GetJournalsByHourOfDay()
+        {
+            var userId = GetUserId();
+            var data = await _service.GetJournalsByHourOfDayAsync(userId);
+            return Ok(data);
         }
     }
 

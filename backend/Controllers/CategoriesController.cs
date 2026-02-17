@@ -31,6 +31,18 @@ public class CategoriesController : ControllerBase
     return Ok(category);
   }
 
+  [HttpPut("{id}")]
+  public async Task<IActionResult> Update(int id, UpdateCategoryDto dto)
+  {
+    var userId = GetUserId();
+    var updated = await _service.UpdateAsync(id, dto, userId);
+
+    if (updated == null)
+      return BadRequest(new { message = "Category name alredy exists or category not found" });
+    
+    return Ok(updated);
+  }
+
   [HttpDelete("{id}")]
   public async Task<IActionResult> Delete(int id)
   {

@@ -1,5 +1,6 @@
 using JournalApi.Data;
 using JournalApi.Models;
+using JournalApi.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -58,8 +59,24 @@ builder.Services.AddAuthentication(options =>
   };
 });
 
+
 var app = builder.Build();
 
+app.UseExceptionHandler(appBuilder =>
+{
+  appBuilder.Run(async context =>
+  {
+    context.Response.ContentType = "application/json";
+    context.Response.StatusCode = 500;
+
+    var error = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+    if (error != null)
+    {
+      var response = new { message = error.Message };
+      await context.Response.WriteAsJsonAsync(response);
+    }
+  });
+});
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -1,3 +1,5 @@
+namespace JournalApi.Services;
+
 using JournalApi.Data;
 using JournalApi.Models;
 using JournalApi.Models.DTOs;
@@ -5,12 +7,16 @@ using Microsoft.EntityFrameworkCore;
 using JournalApi.Models.Common;
 
 public class JournalService : IJournalService
+
 {
     private readonly JournalDbContext _db;
+    private readonly ILogger<JournalService> _logger;
     
-    public JournalService(JournalDbContext db)
+    public JournalService(JournalDbContext db, ILogger<JournalService> logger)
     {
         _db = db;
+        _logger = logger;
+
     }
     private JournalDto MapToDto(JournalEntry journal)
     {
@@ -36,100 +42,140 @@ public class JournalService : IJournalService
     } 
     public async Task<PagedResult<JournalDto>> GetAllAsync(
         string userId, 
-        int sort,
+        JournalSort sort,
         int page, 
         int pageSize,
         int? tagId = null,
         int? categoryId = null,
         string? search = null)
     {
-        var query = _db.JournalEntries
-            .Include(j => j.JournalTags)
-                .ThenInclude(jt => jt.Tag)
-            .Include(j => j.JournalCategories)
-                .ThenInclude(jc => jc.Category)
-            .Where (j => j.UserId == userId && !j.IsDeleted);
-
-
-        if (!string.IsNullOrWhiteSpace(search))
+        try
         {
-            var lowerSearch = search.ToLower();
-            query = query.Where(j =>
-                EF.Functions.Like(j.Title.ToLower(), $"%{lowerSearch}%") ||
-                EF.Functions.Like(j.Content.ToLower(), $"%{lowerSearch}%"));
+            var query = _db.JournalEntries
+                .Include(j => j.JournalTags)
+                    .ThenInclude(jt => jt.Tag)
+                .Include(j => j.JournalCategories)
+                    .ThenInclude(jc => jc.Category)
+                .Where (j => j.UserId == userId && !j.IsDeleted);
+
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var lowerSearch = search.ToLower();
+                query = query.Where(j =>
+                    EF.Functions.Like(j.Title.ToLower(), $"%{lowerSearch}%") ||
+                    EF.Functions.Like(j.Content.ToLower(), $"%{lowerSearch}%"));
+            }
+
+            if (tagId.HasValue)
+            {
+                query = query.Where(j => j.JournalTags.Any(t => t.TagId == tagId));
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(j => j.JournalCategories.Any(c => c.CategoryId == categoryId));
+            }
+
+            query = sort switch
+            {
+                JournalSort.CreatedAtAsc => query.OrderBy(j => j.CreatedAt),
+                JournalSort.TitleAsc => query.OrderBy(j => j.Title),
+                JournalSort.TitleDesc => query.OrderByDescending(j => j.Title),
+                _ => query.OrderByDescending(j => j.CreatedAt)
+            };
+
+            var total = await query.CountAsync();
+
+            var journals = await query
+                .OrderByDescending(j => j.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<JournalDto>
+            {
+                Items = journals.Select(MapToDto).ToList(),
+                TotalCount = total,
+                Page = page,
+                PageSize = pageSize
+            };
         }
-
-        if (tagId.HasValue)
+        catch (Exception ex)
         {
-            query = query.Where(j => j.JournalTags.Any(t => t.TagId == tagId));
+            _logger.LogError(ex, "Error fetching journals for user {UserId}", userId);
+            throw new ApplicationException("Failed to get journals. Please try again.");
         }
-
-        if (categoryId.HasValue)
-        {
-            query = query.Where(j => j.JournalCategories.Any(c => c.CategoryId == categoryId));
-        }
-
-
-        var total = await query.CountAsync();
-
-        var journals = await query
-            .OrderByDescending(j => j.CreatedAt)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-
-        return new PagedResult<JournalDto>
-        {
-            Items = journals.Select(MapToDto).ToList(),
-            TotalCount = total  
-        };
 
     }
 
     public async Task<JournalDto?> GetByIdAsync(int id, string userId)
     {
-        var entry = await _db.JournalEntries
-            .Include(j => j.JournalTags).ThenInclude(jt => jt.Tag)
-            .Include(j => j.JournalCategories).ThenInclude(jc => jc.Category)
-            .FirstOrDefaultAsync(j => j.Id == id && j.UserId == userId && !j.IsDeleted);
+        try
+        {
+            var entry = await _db.JournalEntries
+                .Include(j => j.JournalTags).ThenInclude(jt => jt.Tag)
+                .Include(j => j.JournalCategories).ThenInclude(jc => jc.Category)
+                .FirstOrDefaultAsync(j => j.Id == id && j.UserId == userId && !j.IsDeleted);
 
-            return entry == null ? null : MapToDto(entry);
-    
+                return entry == null ? null : MapToDto(entry);
+        
+        } catch (Exception ex) 
+        {
+            _logger.LogError(ex, "Error fetching journal {JournalId} for user {UserId}", id, userId);
+            throw;
+        }
     }
 
-    public async Task<JournalDto> CreateAsync(
-        CreateJournalDto dto,
-        string userId)
-    {
-        var journal = new JournalEntry
-        {
-            Title = dto.Title,
-            Content = dto.Content,
-            UserId = userId,
-            CreatedAt = DateTime.UtcNow
-        };
 
-        foreach (var categoryId in dto.CategoryIds.Distinct())
+        public async Task<JournalDto> CreateAsync(
+            CreateJournalDto dto,
+            string userId)
         {
-            journal.JournalCategories.Add(new JournalCategory
+            try
             {
-                CategoryId = categoryId
-            });
-        }
+                var journal = new JournalEntry
+                {
+                    Title = dto.Title,
+                    Content = dto.Content,
+                    UserId = userId,
+                    CreatedAt = DateTime.UtcNow
+                };
 
-        foreach (var tagId in dto.TagIds.Distinct())
-        {
+                foreach (var categoryId in dto.CategoryIds.Distinct())
+                {
+                    journal.JournalCategories.Add(new JournalCategory
+                    {
+                        CategoryId = categoryId
+                    });
+                }
+
+                foreach (var tagId in dto.TagIds.Distinct())
+                {
+                
+                    journal.JournalTags.Add(new JournalTag
+                    {
+                        TagId = tagId
+                    });
+                }
+            
+                _db.JournalEntries.Add(journal);
+                await _db.SaveChangesAsync();
+                
+                _logger.LogInformation("Created journal {JournalId} for user {UserId}", journal.Id, userId);
+                return MapToDto(journal);
+            } 
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Error creating journal for user {UserId}", userId);
+                throw new ApplicationException("Could not create journal entry. Please try again.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error creating journal for user {UserId}", userId);
+                throw;
+            }
         
-            journal.JournalTags.Add(new JournalTag
-            {
-                TagId = tagId
-            });
-        }
-    
-        _db.JournalEntries.Add(journal);
-        await _db.SaveChangesAsync();
-
-        return MapToDto(journal);
     }
 
 
@@ -138,49 +184,73 @@ public class JournalService : IJournalService
         UpdateJournalDto dto,
         string userId)
     {
-        var journal = await _db.JournalEntries
-            .Include(j => j.JournalTags)
-            .Include(j => j.JournalCategories)
-            .FirstOrDefaultAsync(j => j.Id == id && j.UserId == userId);
-
-        if (journal == null) return null;
-
-        journal.Title = dto.Title;
-        journal.Content = dto.Content;
-
-        journal.JournalCategories.Clear();
-        foreach (var categoryId in dto.CategoryIds.Distinct())
+        try
         {
-            journal.JournalCategories.Add(new JournalCategory { CategoryId = categoryId });
-        }
+            
+            var journal = await _db.JournalEntries
+                .Include(j => j.JournalTags)
+                .Include(j => j.JournalCategories)
+                .FirstOrDefaultAsync(j => j.Id == id && j.UserId == userId);
 
-        journal.JournalTags.Clear();
-        foreach (var tagId in dto.TagIds.Distinct())
+            if (journal == null) return null;
+
+            journal.Title = dto.Title;
+            journal.Content = dto.Content;
+
+            journal.JournalCategories.Clear();
+            foreach (var categoryId in dto.CategoryIds.Distinct())
+            {
+                journal.JournalCategories.Add(new JournalCategory { CategoryId = categoryId });
+            }
+
+            journal.JournalTags.Clear();
+            foreach (var tagId in dto.TagIds.Distinct())
+            {
+                journal.JournalTags.Add(new JournalTag { TagId = tagId });
+            }
+
+            await _db.SaveChangesAsync();
+            _logger.LogInformation("Updated journal {JournalId} for user {UserId}", id, userId);
+
+            return MapToDto(journal);
+        }
+        catch (Exception ex)
         {
-            journal.JournalTags.Add(new JournalTag { TagId = tagId });
+            _logger.LogError(ex, "Error updating journal {JournalId} for user {UserId}", id, userId);
+            throw;
         }
-
-        await _db.SaveChangesAsync();
-        return MapToDto(journal);
     }
+
+    
 
     public async Task<int> GetCountAsync(string userId, string? search = null)
 {
-    var query = _db.JournalEntries.Where(j => j.UserId == userId && !j.IsDeleted);
+        try
+        {
+            var query = _db.JournalEntries.Where(j => j.UserId == userId && !j.IsDeleted);
 
-    if (!string.IsNullOrWhiteSpace(search))
-    {
-        var lowerSearch = search.ToLower();
-        query = query.Where(j =>
-            EF.Functions.Like(j.Title.ToLower(), $"%{lowerSearch}%") ||
-            EF.Functions.Like(j.Content.ToLower(), $"%{lowerSearch}%"));
-    }
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var lowerSearch = search.ToLower();
+                query = query.Where(j =>
+                    EF.Functions.Like(j.Title.ToLower(), $"%{lowerSearch}%") ||
+                    EF.Functions.Like(j.Content.ToLower(), $"%{lowerSearch}%"));
+            }
 
-    return await query.CountAsync();
+            return await query.CountAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error counting journals for user {UserId}", userId);
+            throw;
+        }
 }
 
-    public async Task<bool> DeleteAsync(int id, string userId)
+    public async Task<bool> SoftDeleteAsync(int id, string userId)
     {
+        try
+        {
+            
         var entry = await _db.JournalEntries
             .FirstOrDefaultAsync(j => j.Id == id && j.UserId == userId);
         if (entry == null) return false;
@@ -189,27 +259,45 @@ public class JournalService : IJournalService
         entry.DeletedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
+        _logger.LogInformation("Soft deleted journal {JournalId} for user {UserId}", id, userId);
         return true;
+    }
+    catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting journal {JournalId} for user {UserId}", id, userId);
+            throw;
+        }
     }
 
     public async Task<bool> RestoreAsync(int id, string userId)
     {
-        var entry = await _db.JournalEntries
-            .FirstOrDefaultAsync(j => 
-                j.Id == id &&
-                j.UserId == userId &&
-                j.IsDeleted);
+            try
+            {
+            var entry = await _db.JournalEntries
+                .FirstOrDefaultAsync(j => 
+                    j.Id == id &&
+                    j.UserId == userId &&
+                    j.IsDeleted);
 
-        if (entry == null) return false;
+            if (entry == null) return false;
 
-        entry.IsDeleted = false;
-        entry.DeletedAt = null;
+            entry.IsDeleted = false;
+            entry.DeletedAt = null;
 
-        await _db.SaveChangesAsync();
-        return true;
+            await _db.SaveChangesAsync();
+            _logger.LogInformation("Restored journal {JournalId} for user {UserId}", id, userId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error restoring journal {JournalId} for user {UserId}", id, userId);
+            throw;
+        }
     }
     public async Task<List<JournalDto>> GetDeletedAsync(string userId)
     {
+        try
+        {
         return await _db.JournalEntries
             .Where(j => j.UserId == userId && j.IsDeleted)
             .OrderByDescending(j => j.DeletedAt)
@@ -221,6 +309,180 @@ public class JournalService : IJournalService
                 CreatedAt = j.CreatedAt
             })
             .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching deleted journal for user {UserId}", userId);
+            throw;
+        }
     }
+
+    public async Task<int> GetTotalJournalsAsync(string userId)
+    {
+        try
+        {
+        return await _db.JournalEntries
+            .Where(j => j.UserId == userId && !j.IsDeleted)
+            .CountAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error counting total journals for user {UserId}", userId);
+            throw;
+        }
+    }
+
+// Most used tags
+public async Task<List<CountDto>> GetMostUsedTagsAsync(string userId, int top = 5)
+{
+    try
+        {
+        return await _db.JournalTags
+            .Where(jt => jt.JournalEntry.UserId == userId && !jt.JournalEntry.IsDeleted)
+            .GroupBy(jt => jt.Tag.Name)
+            .Select(g => new CountDto
+            { 
+                Name = g.Key, 
+                Count = g.Count() 
+                })
+            .OrderByDescending(x => x.Count)
+            .Take(top)
+            .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching top tags for user {UserId}", userId);
+            throw;
+        }
 }
+
+    public async Task<List<CountDto>> GetMostUsedCategoriesAsync(string userId, int top = 5)
+    {
+        try
+        {
+        return await _db.JournalCategories
+            .Where(jc => jc.JournalEntry.UserId == userId && !jc.JournalEntry.IsDeleted)
+            .GroupBy(jc => jc.Category.Name)
+            .Select(g => new CountDto
+            {
+                Name = g.Key,
+                Count = g.Count()
+            })
+            .OrderByDescending(x => x.Count)
+            .Take(top)
+            .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching top categories for user {UserId}", userId);
+            throw;
+        }
+    }
+
+    public async Task<int> GetDeletedCountAsync(string userId)
+    {
+        try
+        {
+        return await _db.JournalEntries
+            .Where(j => j.UserId == userId && j.IsDeleted)
+            .CountAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error counting deleted journals for user {UserId}", userId);
+            throw;
+        }
+    }
+
+    public async Task<List<JournalAnalyticsDto>> GetMonthlyJournalCountsAsync(string userId, int year)
+    {
+        try
+        {
+            return await _db.JournalEntries
+                .Where(j => j.UserId == userId && !j.IsDeleted && j.CreatedAt.Year == year)
+                .GroupBy(j => j.CreatedAt.Month)
+                .Select(g => new JournalAnalyticsDto
+                {
+                    Period = g.Key.ToString("D2"),
+                    Count = g.Count()
+                })
+                .OrderBy(x => x.Period)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching monthly journal counts for user {UserId}, year {Year}", userId, year);
+            throw new ApplicationException("Failed to get monthly journal analytics.");
+        }
+    }
+
+    public async Task<List<JournalAnalyticsDto>> GetYearlyJournalCountsAsync(string userId)
+    {
+        try
+        {
+        return await _db.JournalEntries
+            .Where(j => j.UserId == userId && !j.IsDeleted)
+            .GroupBy(j => j.CreatedAt.Year)
+            .Select(g => new JournalAnalyticsDto
+            {
+                Period = g.Key.ToString(),
+                Count = g.Count()
+            })
+            .OrderBy(x => x.Period)
+            .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching yearly journal counts for user {UserId}", userId);
+            throw new ApplicationException("Failed to get yearly journal analytics.");
+        }
+    }
+
+
+    public async Task<List<JournalTimeAnalyticsDto>> GetJournalsByDayOfWeekAsync(string userId)
+    {
+        try
+        {
+            return await _db.JournalEntries
+                .Where(j => j.UserId == userId && !j.IsDeleted)
+                .GroupBy(j => j.CreatedAt.DayOfWeek)
+                .Select(g => new JournalTimeAnalyticsDto
+                {
+                    Label = g.Key.ToString(),
+                    Count = g.Count()
+                })
+                .OrderBy(g => g.Label)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching journal counts by day of week for user {UserId}", userId);
+            throw new ApplicationException("Failed to get journals by day of week.");
+        }
+    }
+
+    public async Task<List<JournalTimeAnalyticsDto>> GetJournalsByHourOfDayAsync(string userId)
+    {
+        try
+        {
+            return await _db.JournalEntries 
+                .Where(j => j.UserId == userId && !j.IsDeleted)
+                .GroupBy(j => j.CreatedAt.Hour)
+                .Select(g => new JournalTimeAnalyticsDto
+                {
+                    Label = g.Key.ToString("D2"),
+                    Count = g.Count()
+                })
+                .OrderBy(g => g.Label)
+                .ToListAsync(); 
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching journal counts by hour of day for user {UserId}", userId);
+            throw new ApplicationException("Failed to get journals by hour of day.");
+        }
+    }
+
+}
+
 

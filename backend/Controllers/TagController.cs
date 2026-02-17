@@ -32,6 +32,18 @@ public class TagsController : ControllerBase
     return Ok(tag);
   }
 
+  [HttpPut]
+  public async Task<IActionResult> Update(int id, UpdateTagDto dto)
+  {
+    var userId = GetUserId();
+    var updated = await _service.UpdateAsync(id, dto, userId);
+
+    if (updated == null)
+      return BadRequest(new { message = "Tag name already exists or tag not found" });
+    
+    return Ok(updated);
+  }
+
   [HttpDelete("{id}")]
   public async Task<IActionResult> Delete(int id)
   {
