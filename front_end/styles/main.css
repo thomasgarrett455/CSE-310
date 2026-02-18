@@ -6,10 +6,30 @@
 @import "pages/goals.css";
 @import "pages/about-us.css";
 
+:root {
+    --main-color: #7889b7;
+    --secondary-color: #B0B0B0;
+    --third-color: #4E3A28;
+    --fourth-color: #190E4F;
+}
+
+/* {#2A3A6A}; */
+
+.dark {
+    --main-color: #2c2c2c;
+    --secondary-color: #3e3e3e;
+    --third-color: #1e1e1e;
+    --fourth-color: #B0B0B0;
+}
+
+
+
 body {
     margin: 0 auto;
-    background-color: #fffaf2;
+    background-color: var(--main-color);
     min-height: 800px;
+    font-family: Cochin, Times, 'Times New Roman', serif;
+
 }
 
 
@@ -17,7 +37,7 @@ main {
     padding: 3%;
     margin: 5% 15%;
     gap: 50px;
-    background-color: #e8f7ff;
+    background-color: var(--third-color);
     border: 2px solid var(--home-border-color);
     border-radius: 5px;
     }

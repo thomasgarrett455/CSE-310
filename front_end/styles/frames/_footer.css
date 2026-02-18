@@ -1,19 +1,19 @@
 .site-footer {
-    background: #e9eef1;      
+    background: var(--secondary-color);      
     padding: 20px 0;
     text-align: center;
-    border-top: 1px solid #c5cdd2;
+    border-top: 5px solid var(--fourth-color);
     font-size: 0.9rem;
-    color: #333;
+    color: var(--fourth-color);
 }
 
 .site-footer a {
-    color: #005f7a;           
+    color: var(--fourth-color);           
     text-decoration: none;
     margin-left: 10px;
     transition: color 0.2s ease;
 }
 
 .site-footer a:hover {
-    color: #003b5c;           
+    color: var(--third-color);           
 }

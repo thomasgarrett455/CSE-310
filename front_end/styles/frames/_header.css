@@ -1,32 +1,33 @@
-:root {
+/* :root {
     --header-border-color: #7bb7d4;
     --header-bg-color: #c7eaff;
     --header-text-color: #003b5c;
-}
+} */
 
 
 .site-header {
     text-align: center;
-    background-color: var(--header-bg-color);
-    border-bottom: 4px solid var(--header-border-color);
+    background-color: var(--secondary-color);
+    border-bottom: 4px solid var(--fourth-color);
     padding: 20px;
     position: relative;
 }
 
 .site-header h1 {
-    background-color: var(--header-bg-color);
-    color: var(--header-text-color);
+    background-color: var(--secondary-color);
+    color: var(--fourth-color);
     padding: 2%;
-    border-bottom: 1px solid var(--header-border-color);
+    /* border-bottom: 5px solid var(--fourth-color); */
     margin: 0 auto;
     font-size: 3em;
 }
 
 nav {
-    background-color: var(--header-bg-color);
-    border-top: 4px solid var(--header-border-color);
+    background-color: var(--secondary-color);
+    border-top: 4px solid var(--fourth-color);
     margin-top: -10px;
     padding: 10px 0;
+    color: var(--fourth-color);
 }
 
 nav ul {
@@ -38,15 +39,16 @@ nav ul {
 }
 
 li {
-    background-color: #e8f7ff;
-    border-top: 4px solid var(--header-border-color);
+    background-color: var(--main-color);
+    border-top: 4px transparent var(--fourth-color);
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
-    margin-top: -8px;
+    margin-top: -5px;
 }
 
 li:hover {
-    background-color: #ffffff;
+    background-color: var(--fourth-color);
+    color: var(--secondary-color)
 }
 
 li a {
@@ -54,5 +56,25 @@ li a {
     color: var(--header-text-color);
     display: block;
     padding: 10px 20px;
+}
 
+.toggle-range {
+    display: flex;
+    justify-self: flex-end;
+    appearance: none;
+    width: 50px;
+    height: 28px;
+    background: var(--main-color);
+    border-radius: 20px;
+    padding-right: 10px;
+}
+
+.toggle-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--fourth-color);
+    border-radius: 50%;
+    margin: 0 0 0 5px;
+    transition: transform .25s;
 }
