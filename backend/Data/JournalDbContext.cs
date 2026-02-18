@@ -18,6 +18,7 @@ public class JournalDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<JournalTag> JournalTags => Set<JournalTag>();
 
     public DbSet<JournalCategory> JournalCategories => Set<JournalCategory>();
+    public DbSet<Goal> Goals { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -49,14 +50,5 @@ public class JournalDbContext : IdentityDbContext<ApplicationUser>
             .HasOne(jc => jc.Category)
             .WithMany(c => c.JournalCategories)
             .HasForeignKey(jc => jc.CategoryId);
-        // One-to-many between Category and JournalEntry
-        builder.Entity<Category>()
-            .HasMany(c => c.Journals)
-            .WithOne(j => j.Category)
-            .HasForeignKey(j => j.CategoryId)
-            .OnDelete(DeleteBehavior.SetNull); // optional: keeps journals if category deleted
-
-
-    
     }
 }
