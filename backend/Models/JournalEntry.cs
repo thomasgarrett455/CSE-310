@@ -29,4 +29,6 @@ public class JournalEntry
   public List<JournalTag> JournalTags { get; set; } = new();
   public List<JournalCategory> JournalCategories { get; set; } = new();
 
+  public bool IsSaved { get; set; } = false;
+
 }

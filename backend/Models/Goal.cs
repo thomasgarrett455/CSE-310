@@ -22,4 +22,6 @@ public class Goal
   public string UserId { get; set; } = string.Empty;
 
   public bool IsDeleted { get; set; } = false;
+    public bool IsSaved { get; set; } = false;
+
 }

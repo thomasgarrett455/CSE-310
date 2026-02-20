@@ -1,3 +1,4 @@
+using JournalApi.Models;
 using JournalApi.Models.Common;
 using JournalApi.Models.DTOs;
 
@@ -26,4 +27,6 @@ Task<List<CountDto>> GetMostUsedTagsAsync(string userId, int top = 5);
     Task<List<JournalTimeAnalyticsDto>> GetJournalsByDayOfWeekAsync(string userId);
 
     Task<List<JournalTimeAnalyticsDto>> GetJournalsByHourOfDayAsync(string userId);
+    Task<bool> ToggleSaveAsync(int journalId, string userId);
+    Task<List<JournalEntry>> GetSavedAsync(string userId);
 }

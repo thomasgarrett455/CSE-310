@@ -127,5 +127,26 @@ public class GoalService : IGoalService
       _logger.LogError(ex, "Error deleting goal {GoalId}", id);
       throw;
     }
+
+    }
+      public async Task<bool> ToggleSaveAsync(int goalId, string userId)
+    {
+      var goal = await _db.Goals
+        .FirstOrDefaultAsync(g => g.Id == goalId && g.UserId == userId);
+
+      if (goal == null)
+        return false;
+      
+      goal.IsSaved = !goal.IsSaved;
+      await _db.SaveChangesAsync();
+
+      return true;
+  }
+
+  public async Task<List<Goal>>GetSavedAsync(string userId)
+  {
+    return await _db.Goals
+      .Where(g => g.UserId == userId && g.IsSaved && !g.IsDeleted)
+      .ToListAsync();
   }
 }

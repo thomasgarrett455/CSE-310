@@ -483,6 +483,27 @@ public async Task<List<CountDto>> GetMostUsedTagsAsync(string userId, int top = 
         }
     }
 
+    public async Task<bool> ToggleSaveAsync(int journalId, string userId)
+    {
+        var journal = await _db.JournalEntries
+            .FirstOrDefaultAsync(j => j.Id == journalId && j.UserId == userId);
+        
+        if (journal == null)
+            return false;
+        
+        journal.IsSaved = !journal.IsSaved;
+        await _db.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<List<JournalEntry>> GetSavedAsync(string userId)
+    {
+        return await _db.JournalEntries
+            .Where(j => j.UserId == userId && j.IsSaved && !j.IsDeleted)
+            .ToListAsync();
+    }
+
 }
 
 
