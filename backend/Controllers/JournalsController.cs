@@ -186,6 +186,27 @@ namespace JournalApi.Controllers
             var data = await _service.GetJournalsByHourOfDayAsync(userId);
             return Ok(data);
         }
+
+        [HttpPatch("{id}/save")]
+        public async Task<IActionResult> ToggleSave(int id)
+        {
+            var userId = GetUserId();
+
+            var success = await _service.ToggleSaveAsync(id, userId);
+            
+            if (!success)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        [HttpGet("saved")]
+        public async Task<IActionResult> GetSaved()
+        {
+            var userId = GetUserId();
+            var saved = await _service.GetSavedAsync(userId);
+            return Ok(saved);
+        }
     }
 
 }

@@ -100,13 +100,64 @@ namespace JournalApi.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("JournalApi.Models.JournalEntry", b =>
+            modelBuilder.Entity("JournalApi.Models.Goal", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CategoryId")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsSaved")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Goals");
+                });
+
+            modelBuilder.Entity("JournalApi.Models.JournalCategory", b =>
+                {
+                    b.Property<int>("JournalEntryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("JournalEntryId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("JournalCategories");
+                });
+
+            modelBuilder.Entity("JournalApi.Models.JournalEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Content")
@@ -122,6 +173,9 @@ namespace JournalApi.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsSaved")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -132,11 +186,24 @@ namespace JournalApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("JournalEntries");
+                });
+
+            modelBuilder.Entity("JournalApi.Models.JournalTag", b =>
+                {
+                    b.Property<int>("JournalEntryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("JournalEntryId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("JournalTags");
                 });
 
             modelBuilder.Entity("JournalApi.Models.Tag", b =>
@@ -156,21 +223,6 @@ namespace JournalApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Tags");
-                });
-
-            modelBuilder.Entity("JournalEntryTag", b =>
-                {
-                    b.Property<int>("JournalsId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TagsId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("JournalsId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("JournalEntryTag");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -301,36 +353,53 @@ namespace JournalApi.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("JournalApi.Models.JournalEntry", b =>
+            modelBuilder.Entity("JournalApi.Models.JournalCategory", b =>
                 {
                     b.HasOne("JournalApi.Models.Category", "Category")
-                        .WithMany("Journals")
-                        .HasForeignKey("CategoryId");
+                        .WithMany("JournalCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
+                    b.HasOne("JournalApi.Models.JournalEntry", "JournalEntry")
+                        .WithMany("JournalCategories")
+                        .HasForeignKey("JournalEntryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("JournalEntry");
+                });
+
+            modelBuilder.Entity("JournalApi.Models.JournalEntry", b =>
+                {
                     b.HasOne("JournalApi.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Category");
-
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("JournalEntryTag", b =>
+            modelBuilder.Entity("JournalApi.Models.JournalTag", b =>
                 {
-                    b.HasOne("JournalApi.Models.JournalEntry", null)
-                        .WithMany()
-                        .HasForeignKey("JournalsId")
+                    b.HasOne("JournalApi.Models.JournalEntry", "JournalEntry")
+                        .WithMany("JournalTags")
+                        .HasForeignKey("JournalEntryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JournalApi.Models.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
+                    b.HasOne("JournalApi.Models.Tag", "Tag")
+                        .WithMany("JournalTags")
+                        .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("JournalEntry");
+
+                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -386,7 +455,19 @@ namespace JournalApi.Migrations
 
             modelBuilder.Entity("JournalApi.Models.Category", b =>
                 {
-                    b.Navigation("Journals");
+                    b.Navigation("JournalCategories");
+                });
+
+            modelBuilder.Entity("JournalApi.Models.JournalEntry", b =>
+                {
+                    b.Navigation("JournalCategories");
+
+                    b.Navigation("JournalTags");
+                });
+
+            modelBuilder.Entity("JournalApi.Models.Tag", b =>
+                {
+                    b.Navigation("JournalTags");
                 });
 #pragma warning restore 612, 618
         }

@@ -37,6 +37,8 @@ builder.Services
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
+builder.Services.AddScoped<IGoalService, GoalService>();
+
 builder.Services.AddAuthentication(options =>
 {
   options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -58,6 +60,7 @@ builder.Services.AddAuthentication(options =>
     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
   };
 });
+
 
 
 var app = builder.Build();
