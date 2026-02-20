@@ -304,3 +304,15 @@
 /Users/camwoodward/Downloads/CSE310/CSE-310/backend/bin/Debug/net10.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /Users/camwoodward/Downloads/CSE310/CSE-310/backend/bin/Debug/net10.0/Microsoft.IdentityModel.Tokens.dll
 /Users/camwoodward/Downloads/CSE310/CSE-310/backend/bin/Debug/net10.0/System.IdentityModel.Tokens.Jwt.dll
+C:\Users\trifo\Documents\CSE-310\backend\obj\Debug\net10.0\JournalApi.csproj.AssemblyReference.cache
+C:\Users\trifo\Documents\CSE-310\backend\obj\Debug\net10.0\rpswa.dswa.cache.json
+C:\Users\trifo\Documents\CSE-310\backend\obj\Debug\net10.0\JournalApi.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\trifo\Documents\CSE-310\backend\obj\Debug\net10.0\JournalApi.AssemblyInfoInputs.cache
+C:\Users\trifo\Documents\CSE-310\backend\obj\Debug\net10.0\JournalApi.AssemblyInfo.cs
+C:\Users\trifo\Documents\CSE-310\backend\obj\Debug\net10.0\JournalApi.csproj.CoreCompileInputs.cache
+C:\Users\trifo\Documents\CSE-310\backend\obj\Debug\net10.0\JournalApi.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\trifo\Documents\CSE-310\backend\obj\Debug\net10.0\JournalApi.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\trifo\Documents\CSE-310\backend\obj\Debug\net10.0\JournalApi.sourcelink.json
+C:\Users\trifo\Documents\CSE-310\backend\obj\Debug\net10.0\JournalApi.dll
+C:\Users\trifo\Documents\CSE-310\backend\obj\Debug\net10.0\refint\JournalApi.dll
+C:\Users\trifo\Documents\CSE-310\backend\obj\Debug\net10.0\JournalApi.pdb

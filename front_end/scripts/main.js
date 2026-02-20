@@ -1,3 +1,9 @@
+import { apiRequest } from "./api.js";
+
+apiRequest("/api/categories")
+    .then(data => console.log("API Works: ", data))
+    .catch(err => console.error("API Error: ", err));
+
 {
     const toggle = document.querySelector(".toggle-range");
 
@@ -25,4 +31,5 @@
 
         localStorage.setItem("theme", toggle.value);
     });
+
 }
