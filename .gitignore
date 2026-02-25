@@ -24,3 +24,6 @@ appsettings.Local.json
 # Temporary files
 *.tmp
 *.bak
+
+# Environment Variables
+.env
