@@ -1,9 +1,29 @@
+# Build output
 bin/
 obj/
+
+# Visual Studio / VS Code
+.vscode/
 *.user
-*.cache
-*.db
-*.sqlite
+*.suo
+
+# Logs
 *.log
 
+# Cache
+*.cache
 
+# ASP.NET Core environment files
+appsettings.Development.json
+appsettings.Local.json
+
+# SQLite / local DBs (if you ever use them)
+*.db
+*.sqlite
+
+# Temporary files
+*.tmp
+*.bak
+
+# Environment Variables
+.env
