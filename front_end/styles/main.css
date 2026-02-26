@@ -5,6 +5,7 @@
 @import "pages/calendar.css";
 @import "pages/goals.css";
 @import "pages/about-us.css";
+@import "pages/login.css";
 
 :root {
     --main-color: #7889b7;
