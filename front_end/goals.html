@@ -1,49 +1,60 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Goals</title>
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/main.css" />
     <script src="scripts/main.js" defer></script>
     <script src="scripts/goals.js"></script>
     <script>
-        const saved = localStorage.getItem("theme");
-        if (saved === "1") {
-            document.documentElement.classList.add("dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-        }
+      const saved = localStorage.getItem("theme");
+      if (saved === "1") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
     </script>
-</head>
-<body class="goal-page">
+  </head>
+  <body class="goal-page">
     <header class="site-header">
-        <!-- <img src="" alt=""> -->
-        <h1>Journal App</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="calendar.html">Calendar</a></li>
-                <li><a href="goals.html">Goals</a></li>
-                <!-- <li><a href=""></a></li> -->
-            </ul>
-            <input type="range" class="toggle-range" id="darktoggle" min="0" max="1" step="1" value="0">
-        </nav>
+      <!-- <img src="" alt=""> -->
+      <h1>Journal App</h1>
+      <nav>
+        <ul>
+          <li><a href="journal.html">Home</a></li>
+          <li><a href="calendar.html">Calendar</a></li>
+          <li><a href="goals.html">Goals</a></li>
+          <!-- <li><a href=""></a></li> -->
+        </ul>
+        <input
+          type="range"
+          class="toggle-range"
+          id="darktoggle"
+          min="0"
+          max="1"
+          step="1"
+          value="0"
+        />
+      </nav>
     </header>
     <main>
-        <h2>Goals</h2>
-        <section class="goals">
-            <h3>Goal Name: </h3>
-            <p class="dateCreated">01/15/2026</p>
-            <p class="goal-description">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Molestias mollitia illo, odio et inventore voluptates, sit quasi quaerat voluptatem amet fugiat harum sunt veritatis dolor. A rem debitis excepturi doloremque!, Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo quasi pariatur neque in ab dignissimos, perferendis recusandae quas quos mollitia nam ipsum rerum unde, architecto sunt ducimus aliquam magni tempore. Lorem ipsum dolor sit amet consectetur, adipisicing elit. Adipisci voluptatum alias architecto quasi modi maxime exercitationem voluptatem sunt, assumenda ipsam minima error at ex nulla placeat quae laudantium ducimus! Tempora! lorem</p>
-            <button class="checked"></button>
-            <p class="dateComplete">01/24/2026</p>
-        </section>
-        <section id="addGoal"></section>
+      <h2>Goals</h2>
+      <div class="goalsContainer">
+          <section class="goalsTemplate" style="display: none">
+            <h3 class="goalName"></h3>
+            <p class="dateCreated"></p>
+            <p class="goalDescription"></p>
+            <input type="checkbox" class="checked">
+            <p class="dateComplete"></p>
+          </section>
+      </div>
+      <section id="addGoal"></section>
     </main>
-        <footer class="site-footer">
-            <p>&copy; 2026 journal app</p>
-            <a href="about-us.html">About Us</a>
-        </footer>
-</body>
+    <footer class="site-footer">
+      <p>&copy; 2026 journal app</p>
+      <a href="about-us.html">About Us</a>
+    </footer>
+  </body>
 </html>
+

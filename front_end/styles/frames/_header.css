@@ -38,7 +38,7 @@ nav ul {
     padding: 0 20px;
 }
 
-li {
+nav ul li {
     background-color: var(--main-color);
     border-top: 4px transparent var(--fourth-color);
     border-bottom-left-radius: 10px;
@@ -46,12 +46,12 @@ li {
     margin-top: -5px;
 }
 
-li:hover {
+nav ul li:hover {
     background-color: var(--fourth-color);
     color: var(--secondary-color)
 }
 
-li a {
+nav ul li a {
     text-decoration: none;
     color: var(--header-text-color);
     display: block;

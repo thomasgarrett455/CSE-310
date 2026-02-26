@@ -1,10 +1,7 @@
-import { apiRequest } from "./api.js";
 
-apiRequest("/api/categories")
-    .then(data => console.log("API Works: ", data))
-    .catch(err => console.error("API Error: ", err));
 
 {
+    // dark mode toggle logic
     const toggle = document.querySelector(".toggle-range");
 
     if (!toggle) {
@@ -31,5 +28,4 @@ apiRequest("/api/categories")
 
         localStorage.setItem("theme", toggle.value);
     });
-
 }
