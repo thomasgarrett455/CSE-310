@@ -1,4 +1,7 @@
+
+
 {
+    // dark mode toggle logic
     const toggle = document.querySelector(".toggle-range");
 
     if (!toggle) {

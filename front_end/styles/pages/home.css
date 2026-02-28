@@ -8,6 +8,8 @@
     main {
         display: grid;
         grid-template-columns: 1fr 3fr;
+        min-height: 1000px;
+        min-width: 600px;
     }
 
     #aiPrompt {
@@ -16,73 +18,101 @@
         grid-row: 1/2;
         height: 100px;
         background-color: var(--secondary-color);
-            border-radius: 5px;
+        border-radius: 5px;
+        min-height: 150px;
     }
 
     #currGoals {
         border: 2px solid var(--main-color);
         height: 600px;
         grid-column: 1/2;
-        grid-row: 2/7;
+        grid-row: 2/8;
         background-color: var(--secondary-color);
-            border-radius: 5px;
+        border-radius: 5px;
+        min-height: 900px;
+    }
+
+    .goal_list {
+        color: var(--fourth-color);
+        margin: 0 5% 0 0;
+
+    }
+
+    .goal_list li {
+        color: var(--fourth-color);
+        font-size: 1.3em;
     }
 
     #journalEntries {
         border: 2px solid var(--main-color);
-
         grid-column: 2/-1;
         grid-row: 2/6;
         background-color: var(--secondary-color);
-            border-radius: 5px;
+        border-radius: 5px;
+        min-height: 300px;
     }
+
+    #journal_entry {
+        background-color: var(--main-color);
+        margin: 0 6% 0 5%;
+        width: 100%;
+        height: 100%;
+        max-height: 79%;
+        max-width: 89%;
+    }
+
 
     #addGoal {
         border: 2px solid var(--main-color);
         grid-column: 2/-1;
-        grid-row: 6/7;
+        grid-row: 6/8;
         background-color: var(--secondary-color);
         border-radius: 5px;
+        min-width: 400px;
+        min-height: 200px;
 
 
     }
 
     h2 {
         color: var(--fourth-color);
-        margin: 0 auto;
+        margin: 1% 10px;
         text-decoration: underline;
         border-radius: 5px;
-        justify-self: left;
+        
 
     }
 
     #goal-creation {
         background-color: var(--main-color);
-        margin: 0 auto;
-        width: 95%;
-        height: 95%;
+        margin: 0 6% 0 5%;
+        width: 100%;
+        height: 100%;
+        max-height: 65%;
+        max-width: 89%;
 
     }
 
     #submit {
-    display: flex;
-    background-color: var(--third-color);
-    color: var(--fourth-color);
-    width: 150px;
-    gap: 20px;
-    border-radius: 5px;
-    border: 0px solid transparent;
-    font-size: 1.5rem;
-    color: var(--fourth-color);
-    grid-column: 3/4;
-    justify-self: end;
-    margin: 0 auto;
-    justify-content: center;
-    align-items: center;
+        display: flex;
+        background-color: var(--third-color);
+        color: var(--fourth-color);
+        min-width: 150px;
+        width: auto;
+        border-radius: 5px;
+        border: 0px solid transparent;
+        font-size: 1.5rem;
+        color: var(--fourth-color);
+        justify-self: flex-end;
+        margin: 1.5% 5%;
+        justify-content: center;
+        align-items: center;
+        min-height: 40px;
+        
 }
 
-#submit:hover {
-    background-color: var(--main-color);
+    #submit:hover {
+        background-color: var(--main-color);
 }
 
 

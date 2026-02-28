@@ -20,6 +20,21 @@ next();
 //This uses the .json method to parse incoming api requests into json format
 app.use(express.json());
 
+//API for registering a new user
+app.post('/register', async (req, res) => {
+
+});
+
+//API for user login
+app.post('/login', async (req, res) => {
+
+});
+
+//API for user logout
+app.post('/logout', async (req, res) => {
+    
+});
+
 //API to get the journal prompt from the LLM
 app.post('/journal_prompt', async (req, res) => {
 
@@ -55,4 +70,7 @@ app.post('/current_goals', async (req, res) => {
 
 });
 
-
+//This uses port 3000 to listen for api requests
+app.listen(3000, () => {
+    console.log('server running on port 3000');
+});
