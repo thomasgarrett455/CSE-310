@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Daily Entries</title>
     <link rel="stylesheet" href="styles/main.css">
-    <script src="scripts/main.js" defer></script>
-    <script src="scripts/goals.js"></script>
+    <script type="module" src="scripts/main.js" defer></script>
+    <!-- <script type="module" src="scripts/goals.js"></script> -->
     <script>
         const saved = localStorage.getItem("theme");
         if (saved === "1") {
@@ -23,7 +23,7 @@
         <h1>Journal App</h1>
         <nav>
             <ul>
-                <li><a href="index.html">Home</a></li>
+                <li><a href="journal.html">Home</a></li>
                 <li><a href="calendar.html">Calendar</a></li>
                 <li><a href="goals.html">Goals</a></li>
                 <!-- <li><a href=""></a></li> -->
@@ -34,18 +34,28 @@
     <main>
         <section id="aiPrompt">
             <h2>Journal Prompt: </h2>
+            <p></p>
         </section>
+
         <section id="currGoals">
             <h2>Current Goals: </h2>
+            <ul class="goal_list">
+                <li><p>goal</p></li>
+            </ul>
         </section>
+        
         <section id="journalEntries">
             <h2>Jounral Entry: </h2>
+            <input type="text" id="journal_entry">
+            <button id="submit">Save Journal Entry</button>
         </section>
+
         <section id="addGoal">
             <h2>Add Goal: </h2>
             <input type="text" id="goal-creation">
             <button id="submit">Save Goal</button>
         </section>
+
     </main>
     <footer class="site-footer">
         <p>&copy; 2026 journal app</p>
