@@ -12,32 +12,23 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-
     form {
     display: block;
     gap: 1rem;
     }
 
 
-.mode-toggle {
-    position: relative;
-    width: 100%;
-    margin-bottom: 1.5rem;
+.mode-highlight {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr
 }
 
+.label_left {
+    grid-column: 1/2;
+};
 
-.mode-highlight {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 50%;
-    height: 2.2rem;
-    background: var(--main-color);
-    border-radius: 8px;
-    transform: translateY(-50%);
-    transition: left 0.25s ease;
-    z-index: 0;
-    opacity: 0.35;
+.label_right {
+    grid-column: 2/3;
 }
 
 
@@ -48,6 +39,7 @@
     position: relative;
     z-index: 2;
     height: 2rem;
+    grid-column: 1/3;
 }
 
 .create-login::-webkit-slider-thumb {
@@ -66,25 +58,6 @@
 }
 
 
-.mode-labels {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 0.5rem;
-    font-weight: 600;
-    color: var(--fourth-color);
-    z-index: 3;
-    position: relative;
-}
-
-
-
-label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--fourth-color);
-}
-
-
 input[type="text"],
 input[type="password"] {
     padding: 0.6rem;
@@ -96,6 +69,7 @@ input[type="password"] {
     justify-self: center;
     display: flex;
     justify-self: right;
+
 }
 
 input:focus {
@@ -127,9 +101,6 @@ input:focus {
     background: var(--main-color);
 }
 
-.mode-toggle {
-
-}
 
 
 
