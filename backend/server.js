@@ -59,7 +59,30 @@ async function secureHash(password) {
 
 //API for registering a new user
 app.post('/register', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        if (!username || !password) {
+            return res.status(400).json({ error: "Username and password are required"})
+        }
+        
+        const [users] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+        if (users.length > 0) {
+            return res.status(409).json({ error: "Username already exists"});
+        }
+        // Hash the password
+        const hashedPassword = await secureHash(password);
 
+        await pool.query(
+            'INSERT INTO users (username, password) VALUES (?, ?)',
+            [username, hashedPassword]
+        );
+
+        res.status(201).json({ message: "Successfully registered"});
+
+    } catch(error) {
+        console.error("Registration error", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
 //API for user login
@@ -69,6 +92,7 @@ app.post('/login', async (req, res) => {
         if (!username || !password) {
             return res.status(400).json({error: "Username and password are required"});
         }
+
 
         const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
         if (!Array.isArray(rows) || rows.length ===0) {
@@ -93,7 +117,7 @@ app.post('/logout', async (req, res) => {
 
 //API to get the journal prompt from the LLM
 app.post('/journal_prompt', async (req, res) => {
-
+        
 });
 
 //API to get the names of current goals from the db
@@ -125,6 +149,30 @@ app.post('/name_current_goals', async (req, res) => {
 //API to add a goal to the list of goals to the db
 app.post('/add_goal', async (req, res) => {
 
+
+    try {
+        const { username, content } = req.body;
+        if (!username || !content) {
+            return res.status(400).json({error: "Missing required fields" });
+        }
+
+        const [rows] = await pool.query(
+            `INSERT INTO goals (content, date, users_id, prompts_id)
+            VALUES (
+            ?,
+            CURDATE(),
+            (SELECT users_id FROM users WHERE username = ?),
+            ) `,
+            [content, username],
+        );
+        if (!Array.isArray(rows) || rows.length === 0 ) {
+            return res.status(401).json({ message: 'Invalid credentials'});
+        }
+        return res.status(200).json({ goals: rows });
+    } catch (error) {
+        console.error("Error adding goal", error)
+        res.status(500).json({ error: "could not add"})
+    }
 });
 
 //API to save journal entry to db 
