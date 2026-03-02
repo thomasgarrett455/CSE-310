@@ -112,8 +112,34 @@ app.post('/login', async (req, res) => {
 
 //API for user logout
 app.post('/logout', async (req, res) => {
+    // Check if a session exists
+    try {
+        if (!req.session) {
+            return res.status(400).json({ error: "No active session" });
+        }
 
-});
+    // Destroy the session
+    req.session.destroy(err => {
+        if (err) {
+            console.error("Logout failed:", err);
+            return res.status(500).json({ error: "Logout failed" });
+        }
+
+        // Clear the cookie on the client
+        res.clearCookie('connect.sid', {
+            httpOnly: true,
+            secure: true
+        });
+
+        res.status(200).json({ message: "Logged out successfully" });
+
+    });
+
+   } catch(error) {
+        console.error("Logout error: ", error);
+        res.status(500).json({ error: "Iternal server error" });
+   }
+}); 
 
 //API to get the journal prompt from the LLM
 app.post('/journal_prompt', async (req, res) => {
