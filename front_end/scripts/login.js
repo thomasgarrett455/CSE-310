@@ -1,12 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    console.log("DOM ready");
-
-    console.log("all range inputs:", document.querySelectorAll('input[type="range"]'));
-    console.log("create-login:", document.querySelector(".create-login"));
-
-
-
 const storageList = {
     "daniel": "12345678",
     "testuser": "password"
@@ -45,13 +38,19 @@ form.addEventListener("submit", (e) => {
     }
 })
 
-const toggle = document.querySelector(".create-login")
-console.log("toggle is", toggle);
+    const toggle = document.querySelector(".create-login");
+
+    if (!toggle) {
+        console.warn("Toggle element not found.");
+    } 
+
+    toggle.addEventListener("mousedown", e => {
+        e.preventDefault();
+    });
 
 
-toggle.addEventListener("pointerdown", e => {
-    toggle.value = toggle.value === "0" ? "1" : "0";
-    toggle.setAttribute("value", toggle.value);
-});
-
+    toggle.addEventListener("click", () => {
+        toggle.value = toggle.value === "0" ? "1" : "0";
+        toggle.setAttribute("value", toggle.value);
+    });
 });
