@@ -98,7 +98,28 @@ app.post('/journal_prompt', async (req, res) => {
 
 //API to get the names of current goals from the db
 app.post('/name_current_goals', async (req, res) => {
+    try{
+        const { username } = req.body;
+        if (!username) {
+            return res.status(400).json({error: "Username not found"});
+        }
 
+        const [rows] = await pool.query(
+            `SELECT goals.name
+             FROM goals
+             JOIN users
+             ON goals.users_id = users.users_id
+             WHERE users.username = ?`,
+            [username],
+        );
+        if (!Array.isArray(rows) || rows.length === 0 ) {
+            return res.status(401).json({ message: 'Invalid credentials'});
+        }
+        return res.status(200).json({ goals: rows });
+    } catch (error) {
+        console.error("Error fetching goal names", error)
+        res.status(500).json({ error: "could not fetch goal names"})
+    }
 });
 
 //API to add a goal to the list of goals to the db
@@ -108,22 +129,109 @@ app.post('/add_goal', async (req, res) => {
 
 //API to save journal entry to db 
 app.post('/journal_entry', async (req, res) => {
+    try{
+        const { username, content, prompt } = req.body;
+        if (!username) {
+            return res.status(400).json({error: "Username not found"});
+        }
 
+        const [rows] = await pool.query(
+            `INSERT INTO journals (content, date, users_id, prompts_id)
+            VALUES (
+            ?,
+            CURDATE(),
+            (SELECT users_id FROM users WHERE username = ?),
+            (SELECT prompt_id FROM prompts WHERE prompt = ?)
+            ) `,
+            [content, username, prompt],
+        );
+        if (!Array.isArray(rows) || rows.length === 0 ) {
+            return res.status(401).json({ message: 'Invalid credentials'});
+        }
+        return res.status(200).json({ goals: rows });
+    } catch (error) {
+        console.error("Error saving journal entry", error)
+        res.status(500).json({ error: "could not save journal entry"})
+    }
 });
 
 //API to get journal entry dates from the db
 app.post('/get_journal_entry_dates', async (req, res) => {
+    try{
+        const { username } = req.body;
+        if (!username) {
+            return res.status(400).json({error: "Username not found"});
+        }
 
+        const [rows] = await pool.query(
+            `SELECT journals.date
+             FROM journals
+             JOIN users
+             ON journals.users_id = users.users_id
+             WHERE users.username = ?`,
+            [username],
+        );
+        if (!Array.isArray(rows) || rows.length === 0 ) {
+            return res.status(401).json({ message: 'Invalid credentials'});
+        }
+        return res.status(200).json({ goals: rows });
+    } catch (error) {
+        console.error("Error fetching goal names", error)
+        res.status(500).json({ error: "could not fetch goal names"})
+    }
 });
 
 //API to get the journal entry from the selected date
 app.post('/get_journal_entry', async (req, res) => {
+    try{
+        const { username, date } = req.body;
+        if (!username || !date) {
+            return res.status(400).json({error: "Username or date not found"});
+        }
 
+        const [rows] = await pool.query(
+            `SELECT journals.content
+             FROM journals
+             JOIN users
+             ON journals.users_id = users.users_id
+             WHERE users.username = ?
+             AND date = ?`,
+            [username, date],
+        );
+        if (!Array.isArray(rows) || rows.length === 0 ) {
+            return res.status(401).json({ message: 'Invalid credentials'});
+        }
+        return res.status(200).json({ goals: rows });
+    } catch (error) {
+        console.error("Error fetching journal entries", error)
+        res.status(500).json({ error: "could not fetch journal entries"})
+    }
 });
 
 //API to get the full list of current goal names and descriptions
 app.post('/current_goals', async (req, res) => {
+    try{
+        const { username } = req.body;
+        if (!username) {
+            return res.status(400).json({error: "Username not found"});
+        }
 
+        const [rows] = await pool.query(
+            `SELECT goals.name, goals.description
+             FROM goals
+             JOIN users
+             ON goals.users_id = users.users_id
+             WHERE users.username = ?`,
+            [username],
+        );
+        if (!Array.isArray(rows) || rows.length === 0 ) {
+            return res.status(401).json({ message: 'Invalid credentials'});
+        }
+        return res.status(200).json({ goals: rows });
+    } catch (error) {
+        console.error("Error fetching goal names", error)
+        res.status(500).json({ error: "could not fetch goal names"})
+    }
 });
 
 //This uses port 3000 to listen for api requests
