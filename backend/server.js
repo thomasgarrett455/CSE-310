@@ -93,7 +93,7 @@ app.post('/logout', async (req, res) => {
 
 //API to get the journal prompt from the LLM
 app.post('/journal_prompt', async (req, res) => {
-
+        
 });
 
 //API to get the names of current goals from the db
