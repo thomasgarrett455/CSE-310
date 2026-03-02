@@ -4,6 +4,10 @@ import express from 'express';
 //This will allow us to easily make request to our database
 import { pool } from "./db.js";
 
+//This will allow us to hash paswords for greater account security
+//We can also check passwords for login by using argon2.verify
+import argon2 from 'argon2';
+
 //Creates a variable named app that uses express
 const app = express();
 
@@ -17,8 +21,41 @@ res.header("Access-Control-Allow-Headers", "Content-Type");
 next();
 });
 
+//This is for the aws setup, don't unccoment this line until running on an ec2 instance with nginx
+//app.set('trust proxy', 1);
+
 //This uses the .json method to parse incoming api requests into json format
 app.use(express.json());
+
+//This is for the users cookies. It ensure security for user sessions
+app.use(session({
+    secret: process.env.SESSION_SECRET, //secret code to ensure session security
+    resave: false, //If a session was not modified it will not be saved
+    saveUninitialized: false, //cookie wont be created until data is stored
+    cookie: {
+        httpOnly: true,
+        secure: true,
+        maxAge: 1000 * 60 * 60
+    }
+
+}));
+
+//This function is used to hash passwords for registration
+async function secureHash(password) {
+    try {
+        const hash = await argon2.hash(password, {
+            type: argon2.argon2id, 
+            memoryCost: 2 ** 16,
+            timeCost: 3,
+            parallelism: 4
+        });
+        return hash;
+    } catch (err) {
+        console.error("Hashing failed:", err);
+        throw new Error("Password hashing failed");
+    }
+}
+
 
 //API for registering a new user
 app.post('/register', async (req, res) => {
@@ -27,12 +64,31 @@ app.post('/register', async (req, res) => {
 
 //API for user login
 app.post('/login', async (req, res) => {
+    try {
+        const { username, password } = req.body 
+        if (!username || !password) {
+            return res.status(400).json({error: "Username and password are required"});
+        }
 
+        const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+        if (!Array.isArray(rows) || rows.length ===0) {
+            return res.status(401).json({ message: 'Invalid Credentials' });
+        }
+        const user = rows[0];
+        const isPasswordValid = await argon2.verify(user.password, password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Invalid Credentials'});
+        }
+        res.json({ message: 'Login Successful'});
+    } catch (error) {
+        console.error("Login error: ", error);
+        res.status(500).json({ error: "Internal server error"});
+    }
 });
 
 //API for user logout
 app.post('/logout', async (req, res) => {
-    
+
 });
 
 //API to get the journal prompt from the LLM
