@@ -22,7 +22,7 @@ app.use(express.json());
 
 //API for registering a new user
 app.post('/register', async (req, res) => {
-
+    pool.query = ""
 });
 
 //API for user login
@@ -32,7 +32,7 @@ app.post('/login', async (req, res) => {
 
 //API for user logout
 app.post('/logout', async (req, res) => {
-    
+
 });
 
 //API to get the journal prompt from the LLM
