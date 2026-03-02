@@ -21,6 +21,7 @@
     });
 
     toggle.addEventListener("click", () => {
+        e.preventDefault();
         toggle.value = toggle.value === "0" ? "1" : "0";
         toggle.setAttribute("value", toggle.value);
 

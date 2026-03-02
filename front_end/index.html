@@ -3,35 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login</title>
     <link rel="stylesheet" href="styles/main.css">
     <script src="scripts/login.js" defer></script>
 </head>
 <body class="login-page">
     <main>
-        <form id="loginForm">
-            <div class="mode-toggle">
-                <div class="mode-highlight"></div>
-
+        <form id="login-form">
+                    
+                    <span class="label-left">Login</span>
                     <input 
-                        type="range" 
-                        class="create-login" 
-                        id="create-login" 
-                        min="0" 
-                        max="1" 
-                        step="1" 
-                        value="0"
+                    type="range" 
+                    class="create-login" 
+                    id="create-login" 
+                    min="0" 
+                    max="1" 
+                    step="1" 
+                    value="0"
+                    
                     >
+                    <span class="label-right">Create Account</span>
 
-                <div class="mode-labels">
-                    <span>Login</span>
-                    <span>Create</span>
-                </div>
-            </div>
 
-            <label for="username" class="usernameLabel">Username</label>
+
+            <label for="username" class="username-label">Username</label>
                 <input type="text" class="username" id="username" required>
-            <label for="password" class="passwordLabel">Password</label>
+            <label for="password" class="password-label">Password</label>
                 <input type="password" class="password" id="password" required>
             <p class="error"></p>
             <button class="submitLogin">Submit</button>
