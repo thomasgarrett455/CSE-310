@@ -8,6 +8,8 @@ import { pool } from "./db.js";
 //We can also check passwords for login by using argon2.verify
 import argon2 from 'argon2';
 
+import session from "express-session";
+
 //Creates a variable named app that uses express
 const app = express();
 
