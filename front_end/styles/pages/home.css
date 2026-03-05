@@ -107,13 +107,12 @@
     #submit {
         display: flex;
         background-color: var(--third-color);
-        color: var(--fourth-color);
+        color: var(--secondary-color);
         min-width: 150px;
         width: auto;
         border-radius: 5px;
-        border: 0px solid transparent;
+        border: 2px solid var(--fourth-color);
         font-size: 1.5rem;
-        color: var(--fourth-color);
         justify-self: flex-end;
         margin: 1.5% 5%;
         justify-content: center;
@@ -124,6 +123,7 @@
 
     #submit:hover {
         background-color: var(--main-color);
+        color: var(--fourth-color);
 }
 
 

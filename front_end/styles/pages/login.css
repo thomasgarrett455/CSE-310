@@ -28,6 +28,7 @@
     justify-self: right;
     grid-column: 1/2;
     grid-row:1/2;
+    color: var(--fourth-color);
 }
 
 .label-right {
@@ -35,6 +36,7 @@
     justify-self: center;
     grid-column: 3/4;
     grid-row:1/2;
+    color: var(--fourth-color);
 }
 
 
@@ -68,6 +70,7 @@
     width: 100%;
     min-height: 25px;
     align-self: center;
+    color: var(--fourth-color);
 }
 
 

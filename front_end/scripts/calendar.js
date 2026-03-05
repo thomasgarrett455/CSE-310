@@ -1,4 +1,15 @@
 {
+
+  // testing journal icons:
+  const journalDates = [
+  "3/4/2026",
+  "3/7/2026",
+  "3/12/2026"
+];
+  // var entryText = document.querySelector()
+  // const previewText = entryText.slice(0, 50)
+
+
   // Calendar logic code
   function loadCalendar(year, month) {
     const calendar = document.getElementById("calendar");
@@ -22,7 +33,10 @@
     for (let day = 1; day <= daysInMonth; day++) {
       const cell = document.createElement("div");
       cell.classList.add("day");
-      cell.textContent = day;
+      cell.tinnerHTML = `
+      <div class="day-number">${day}</div>
+      ${hasEntry ? `<div class="day-preview">${previewText}</div>` : ""}
+      `;
       calendar.appendChild(cell);
     }
     // creates a number of empty cells after the last day to fill the rest of that week
@@ -79,6 +93,8 @@
       loadCalendar(currentYear, currentMonth);
       document.getElementById("yearDisplay").textContent =
         `${monthNames[currentMonth]} ${currentYear}`;
+
+      markJournalDays(currentYear, currentMonth, journalDates)
     }
     // returns to the current month and year when return button is pressed
     document.getElementById("return").addEventListener("click", () => {
@@ -98,5 +114,35 @@
     });
   }
 }
+
+// marks the journal with text from the entry
+
+function markJournalDays(year, month, journalDates) {
+  const cells = document.querySelectorAll("#calendar .day");
+
+  cells.forEach(cell => {
+    const day = Number(cell.textContent);
+    if (!day) return;
+
+    const key = `${month + 1}/${day}/${year}`;
+    const entry = entries[key]
+
+    if (entry) {
+      const preview = entry.text.slice(0,12)
+      cell.classList.add("has-entry")
+      cell.innerHTML = `
+      <div class="day-number">${day}</div>
+      <div class="day-preview">${preview}</div>
+      `;
+    }
+  });
+}
+
+
+
+
+
+
+
 
 updateCalendar();

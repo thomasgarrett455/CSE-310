@@ -101,6 +101,10 @@ main {
     background-color: var(--secondary-color);
 }
 
+.day:hover {
+    filter:brightness(.7);
+}
+
 .day:empty {
     background-color: var(--main-color);
 }
@@ -109,6 +113,9 @@ main {
     background-color: var(--main-color);
 }
 
+.day.has-entry::after {
+    content: "📝"
+}
 
 
 
