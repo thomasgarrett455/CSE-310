@@ -1,5 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
+console.log("Session Secret Loaded:", process.env.SESSION_SECRET ? "YES" : "NO");
+
 //Express is a framework that makes it much easeir to handle apis
 import express from 'express';
+import session from 'express-session';
 
 //This will allow us to easily make request to our database
 import { pool } from "./db.js";
@@ -187,7 +193,7 @@ app.post('/add_goal', async (req, res) => {
             VALUES (
             ?,
             CURDATE(),
-            (SELECT users_id FROM users WHERE username = ?),
+            (SELECT users_id FROM users WHERE username = ?)
             ) `,
             [content, username],
         );
@@ -291,16 +297,18 @@ app.post('/current_goals', async (req, res) => {
         }
 
         const [rows] = await pool.query(
-            `SELECT goals.name, goals.description
+            `SELECT 
+                goals.name, 
+                goals.description,
+                DATE_FORMAT(goals.date_created, '%m/%d/%Y') AS dateCreated,
+                DATE_FORMAT(goals.date_completed, '%m/%d/%Y') AS dateComplete
              FROM goals
              JOIN users
              ON goals.users_id = users.users_id
              WHERE users.username = ?`,
-            [username],
+            [username]
         );
-        if (!Array.isArray(rows) || rows.length === 0 ) {
-            return res.status(401).json({ message: 'Invalid credentials'});
-        }
+
         return res.status(200).json({ goals: rows });
     } catch (error) {
         console.error("Error fetching goal names", error)

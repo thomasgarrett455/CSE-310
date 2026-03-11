@@ -1,10 +1,12 @@
 
 // functoin to load the node js api, can be modified to get the specific api
 async function loadGoals() {
+    const username = localStorage.getItem("username");
+
     const response = await fetch("http://Localhost:3000/api/goals", {
         method: "POST",
         headers: {"Content-Type": "application/json"}, 
-        body: JSON.stringify({})
+        body: JSON.stringify({ username })
     });
     const data = await response.json();
     renderGoals(data.goals);
