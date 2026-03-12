@@ -166,9 +166,30 @@ function markJournalDays(year, month) {
       <div class="day-number">${day}</div>
       <div class="day-preview">${preview}</div>
       `;
+      cell.addEventListener("click", () => {
+        openJournalModal(key, entry);
+      })
     }
   });
 }
+
+function openJournalModal(dateKey, fullText) {
+  document.getElementById("modal-date").textContent = dateKey;
+  document.getElementById("modal-text").textContent = fullText;
+
+  document.getElementById("journal-modal").style.display = "block";
+}
+
+document.getElementById("close-modal").addEventListener("click", () {
+  document.getElementById("journal-modal").style.display = "none";
+});
+
+window.addEventListener("click", (e) => {
+  const modal = document.getElementById("journal-modal");
+  if (e.target == modal) {
+    modal.style.display = "none";
+  }
+})
 
 async function init() {
   entries = await LoadJournalMap("daniel");
