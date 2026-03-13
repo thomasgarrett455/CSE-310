@@ -26,4 +26,4 @@ appsettings.Local.json
 *.bak
 
 # Environment Variables
-.env
+*.env
