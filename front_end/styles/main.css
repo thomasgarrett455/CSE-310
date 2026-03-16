@@ -30,7 +30,12 @@ body {
     background-color: var(--main-color);
     min-height: 800px;
     font-family: Cochin, Times, 'Times New Roman', serif;
+    cursor: default;
+    caret-color: transparent;
+}
 
+button {
+    cursor: pointer;
 }
 
 

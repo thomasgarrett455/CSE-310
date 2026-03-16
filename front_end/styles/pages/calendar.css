@@ -103,6 +103,7 @@ main {
 
 .day:hover {
     filter:brightness(.7);
+    cursor: pointer;
 }
 
 .day:empty {
@@ -128,8 +129,8 @@ main {
 
 .modal-content {
     background: var(--main-color);
-    width: 40%;
-    height: 40%;
+    width: 50%;
+    height: 50%;
     max-width: 90%;
     margin: 100px auto;
     border-radius: 8px;
@@ -138,17 +139,24 @@ main {
     padding: 1%;
     border: 3px solid var(--fourth-color);
     font-size: 1.3rem;
+    overflow-y: auto;
+    max-height: 80vh;
 }
 
 #modalText {
     width: 100%;
-
+    overflow-wrap: break-word;
 }
 
 .close {
     float: right;
     font-size: 3rem;
     color: var(--fourth-color);
+}
+
+.close:hover {
+    color: var(--secondary-color);
+    cursor: pointer;
 }
 
 }
