@@ -16,11 +16,16 @@ const app = express();
 //This will allow requests that come from the frontend
 //req = request, res = response, next processes request step by step 
 app.use((req, res, next) => {
-res.header("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
-res.header("Allow-Control-Access", "POST");
-res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
+    res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
 
-next();
+    // Handle CORS preflight requests
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(204);
+    }
+
+    next();
 });
 
 //This is for the aws setup, don't unccoment this line until running on an ec2 instance with nginx
@@ -75,7 +80,7 @@ app.post('/register', async (req, res) => {
         const hashedPassword = await secureHash(password);
 
         await pool.query(
-            'INSERT INTO users (username, password) VALUES (?, ?)',
+            'INSERT INTO users (username, password_hash, created_at) VALUES (?, ?, NOW())',
             [username, hashedPassword]
         );
 
