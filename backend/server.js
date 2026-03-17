@@ -8,8 +8,7 @@ import { pool } from "./db.js";
 //We can also check passwords for login by using argon2.verify
 import argon2 from 'argon2';
 
-//For session management
-import session from 'express-session';
+import session from "express-session";
 
 //Creates a variable named app that uses express
 const app = express();
@@ -17,11 +16,16 @@ const app = express();
 //This will allow requests that come from the frontend
 //req = request, res = response, next processes request step by step 
 app.use((req, res, next) => {
-res.header("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
-res.header("Allow-Control-Access", "POST");
-res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
+    res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
 
-next();
+    // Handle CORS preflight requests
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(204);
+    }
+
+    next();
 });
 
 //This is for the aws setup, don't unccoment this line until running on an ec2 instance with nginx
@@ -76,7 +80,7 @@ app.post('/register', async (req, res) => {
         const hashedPassword = await secureHash(password);
 
         await pool.query(
-            'INSERT INTO users (username, password) VALUES (?, ?)',
+            'INSERT INTO users (username, password_hash, created_at) VALUES (?, ?, NOW())',
             [username, hashedPassword]
         );
 
@@ -115,8 +119,34 @@ app.post('/login', async (req, res) => {
 
 //API for user logout
 app.post('/logout', async (req, res) => {
+    // Check if a session exists
+    try {
+        if (!req.session) {
+            return res.status(400).json({ error: "No active session" });
+        }
 
-});
+    // Destroy the session
+    req.session.destroy(err => {
+        if (err) {
+            console.error("Logout failed:", err);
+            return res.status(500).json({ error: "Logout failed" });
+        }
+
+        // Clear the cookie on the client
+        res.clearCookie('connect.sid', {
+            httpOnly: true,
+            secure: true
+        });
+
+        res.status(200).json({ message: "Logged out successfully" });
+
+    });
+
+   } catch(error) {
+        console.error("Logout error: ", error);
+        res.status(500).json({ error: "Iternal server error" });
+   }
+}); 
 
 //API to get the journal prompt from the LLM
 app.post('/journal_prompt', async (req, res) => {
