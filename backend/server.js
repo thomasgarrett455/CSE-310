@@ -172,8 +172,6 @@ app.post('/name_current_goals', async (req, res) => {
         if (!username) {
             return res.status(400).json({error: "Username not found"});
         }
-        console.log("📥 Received username:", username); // ADD THIS
-        console.log("📥 Username type:", typeof username);
 
         const [rows] = await pool.query(
             `SELECT name
@@ -183,11 +181,7 @@ app.post('/name_current_goals', async (req, res) => {
              WHERE users.username = ?`,
             [username],
         );
-        console.log("🗄️ Raw query rows:", rows); // ADD THIS
-        console.log("🗄️ Row count:", rows.length);
-        // if (!Array.isArray(rows) || rows.length === 0 ) {
-        // return res.status(401).json({ message: 'Invalid credentials'});
-        // }
+      
         return res.status(200).json({ goals: rows });
     } catch (error) {
         console.error("Error fetching goal names", error)
