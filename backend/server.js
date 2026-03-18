@@ -172,18 +172,22 @@ app.post('/name_current_goals', async (req, res) => {
         if (!username) {
             return res.status(400).json({error: "Username not found"});
         }
+        console.log("📥 Received username:", username); // ADD THIS
+        console.log("📥 Username type:", typeof username);
 
         const [rows] = await pool.query(
-            `SELECT goals.name
+            `SELECT name
              FROM goals
              JOIN users
              ON goals.users_id = users.users_id
              WHERE users.username = ?`,
             [username],
         );
-        if (!Array.isArray(rows) || rows.length === 0 ) {
-            return res.status(401).json({ message: 'Invalid credentials'});
-        }
+        console.log("🗄️ Raw query rows:", rows); // ADD THIS
+        console.log("🗄️ Row count:", rows.length);
+        // if (!Array.isArray(rows) || rows.length === 0 ) {
+        // return res.status(401).json({ message: 'Invalid credentials'});
+        // }
         return res.status(200).json({ goals: rows });
     } catch (error) {
         console.error("Error fetching goal names", error)
@@ -193,30 +197,38 @@ app.post('/name_current_goals', async (req, res) => {
 
 //API to add a goal to the list of goals to the db
 app.post('/add_goal', async (req, res) => {
-
-
     try {
-        const { username, content } = req.body;
+        const { username, name, content } = req.body;
+
         if (!username || !content) {
-            return res.status(400).json({error: "Missing required fields" });
+            return res.status(400).json({ error: "Missing required fields" });
         }
 
-        const [rows] = await pool.query(
-            `INSERT INTO goals (content, date, users_id, prompts_id)
-            VALUES (
-            ?,
-            CURDATE(),
-            (SELECT users_id FROM users WHERE username = ?)
-            ) `,
-            [content, username],
+        const [[user]] = await pool.query(
+            "SELECT users_id FROM users WHERE username = ?",
+            [username]
         );
-        if (!Array.isArray(rows) || rows.length === 0 ) {
-            return res.status(401).json({ message: 'Invalid credentials'});
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
         }
-        return res.status(200).json({ goals: rows });
+
+        const userId = user.users_id;
+    
+        const [result] = await pool.query(
+            `INSERT INTO goals (name, description, status, users_id, created_at)
+             VALUES ("goal123", ?, 0, ?, Now())`,
+            [content, userId] //add name back in 
+        );
+
+        return res.status(200).json({
+            message: "Goal saved",
+            goalId: result.insertId
+        });
+
     } catch (error) {
-        console.error("Error adding goal", error)
-        res.status(500).json({ error: "could not add"})
+        console.error("Error adding goal", error);
+        res.status(500).json({ error: "Could not add goal" });
     }
 });
 
