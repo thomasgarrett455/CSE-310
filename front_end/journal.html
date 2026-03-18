@@ -6,6 +6,8 @@
     <title>Daily Entries</title>
     <link rel="stylesheet" href="styles/main.css">
     <script type="module" src="scripts/main.js" defer></script>
+    <script type="module" src="scripts/auth.js" defer></script>
+
     <!-- <script type="module" src="scripts/goals.js"></script> -->
     <script>
         const saved = localStorage.getItem("theme");
@@ -15,12 +17,13 @@
             document.documentElement.classList.remove("dark");
         }
     </script>
-
 </head>
 <body class="home-page">
     <header class="site-header">
         <!-- <img src="" alt=""> -->
-        <h1>Journal App</h1>
+        <h1>The Daily Entry</h1>
+        <!-- <h1>Daily Entry</h1> -->
+
         <nav>
             <ul>
                 <li><a href="journal.html">Home</a></li>
@@ -29,33 +32,35 @@
                 <!-- <li><a href=""></a></li> -->
             </ul>
             <input type="range" class="toggle-range" id="darktoggle" min="0" max="1" step="1" value="0">
+            <button class="login-button"><a href="index.html">Logout</a></button>
         </nav>
     </header>
     <main>
-        <section id="aiPrompt">
-            <h2>Journal Prompt: </h2>
-            <p></p>
-        </section>
+        <section id="journal-form">
+            <section id="aiPrompt">
+                <h2>Journal Prompt: </h2>
+                <p></p>
+            </section>
 
-        <section id="currGoals">
-            <h2>Current Goals: </h2>
-            <ul class="goal_list">
-                <li><p>goal</p></li>
-            </ul>
-        </section>
-        
-        <section id="journalEntries">
-            <h2>Jounral Entry: </h2>
-            <textarea id="journal_entry"></textarea>
-            <button id="submit">Save Journal Entry</button>
-        </section>
+            <section id="currGoals">
+                <h2>Current Goals: </h2>
+                <ul class="goal_list">
+                    <li><p>goal</p></li>
+                </ul>
+            </section>
+            
+            <section id="journalEntries">
+                <h2>Jounral Entry: </h2>
+                <textarea id="journal_entry"></textarea>
+                <button id="submit-journal">Save Journal Entry</button>
+            </section>
 
-        <section id="addGoal">
-            <h2>Add Goal: </h2>
-            <textarea type="text" id="goal-creation"></textarea>
-            <button id="submit">Save Goal</button>
+            <section id="addGoal">
+                <h2>Add Goal: </h2>
+                <textarea type="text" id="goal-creation"></textarea>
+                <button id="submit-goal">Save Goal</button>
+            </section>
         </section>
-
     </main>
     <footer class="site-footer">
         <p>&copy; 2026 journal app</p>

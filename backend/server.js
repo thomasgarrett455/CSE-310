@@ -14,17 +14,25 @@ import { pool } from "./db.js";
 //We can also check passwords for login by using argon2.verify
 import argon2 from 'argon2';
 
+import session from "express-session";
+
 //Creates a variable named app that uses express
 const app = express();
 
 //This will allow requests that come from the frontend
 //req = request, res = response, next processes request step by step 
 app.use((req, res, next) => {
-res.header("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
-res.header("Allow-Control-Access", "POST");
-res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header("Access-Control-Allow-Origin", "http://localhost:5500");
+    res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header("Access-Control-Allow-Credentials", "true"); 
 
-next();
+    // Handle CORS preflight requests
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(204);
+    }
+
+    next();
 });
 
 //This is for the aws setup, don't unccoment this line until running on an ec2 instance with nginx
@@ -40,7 +48,8 @@ app.use(session({
     saveUninitialized: false, //cookie wont be created until data is stored
     cookie: {
         httpOnly: true,
-        secure: true,
+        secure: false, //process.env.SECURE_ENV,
+        sameSite: "lax",
         maxAge: 1000 * 60 * 60
     }
 
@@ -79,7 +88,7 @@ app.post('/register', async (req, res) => {
         const hashedPassword = await secureHash(password);
 
         await pool.query(
-            'INSERT INTO users (username, password) VALUES (?, ?)',
+            'INSERT INTO users (username, password_hash, created_at) VALUES (?, ?, NOW())',
             [username, hashedPassword]
         );
 
@@ -105,15 +114,25 @@ app.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid Credentials' });
         }
         const user = rows[0];
-        const isPasswordValid = await argon2.verify(user.password, password);
+        const isPasswordValid = await argon2.verify(user.password_hash, password);
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid Credentials'});
         }
+        req.session.username = user.username
+        console.log("✅ Session after login:", req.session);
         res.json({ message: 'Login Successful'});
     } catch (error) {
         console.error("Login error: ", error);
         res.status(500).json({ error: "Internal server error"});
     }
+});
+
+app.get('/me', (req, res) => {
+    
+    if (!req.session.username) {
+        return res.status(401).json({error: "Not logged in" });
+}
+    res.json({ username: req.session.username})
 });
 
 //API for user logout

@@ -1,8 +1,4 @@
-/* :root {
-    --header-border-color: #7bb7d4;
-    --header-bg-color: #c7eaff;
-    --header-text-color: #003b5c;
-} */
+
 
 
 .site-header {
@@ -17,7 +13,6 @@
     background-color: var(--secondary-color);
     color: var(--fourth-color);
     padding: 2%;
-    /* border-bottom: 5px solid var(--fourth-color); */
     margin: 0 auto;
     font-size: 3em;
 }
@@ -53,9 +48,13 @@ nav ul li:hover {
 
 nav ul li a {
     text-decoration: none;
-    color: var(--header-text-color);
+    color: var(--fourth-color);
     display: block;
     padding: 10px 20px;
+}
+
+nav ul li a:hover {
+    color: var(--secondary-color);
 }
 
 .toggle-range {
@@ -77,4 +76,36 @@ nav ul li a {
     border-radius: 50%;
     margin: 0 0 0 5px;
     transition: transform .25s;
+}
+
+.login-button {
+    margin-top: 10px;
+    display: flex;
+    justify-self: flex-end;
+    background-color: var(--main-color);
+    border: none;
+    border-radius: 5px;
+    width: 80px;
+    height: 30px;
+    padding:0;
+    font-size: 1.1rem;
+}
+
+.login-button a {
+    margin-top: 5px;
+    text-decoration: none;
+    color: var(--fourth-color);
+    display: block;
+    width: 100%;
+    font-size: 1em;
+    font-family: Cochin, Times, 'Times New Roman', serif;;
+}
+
+.login-button a:hover {
+    color: var(--secondary-color);
+}
+
+.login-button:hover {
+    background-color: var(--fourth-color);
+    color: var(--secondary-color);
 }

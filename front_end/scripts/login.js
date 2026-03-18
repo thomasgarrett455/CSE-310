@@ -1,57 +1,77 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const username = document.querySelector(".username");
+    const password = document.querySelector(".password");
+    const error = document.querySelector(".error");
+    const form = document.getElementById("login-form");
+    const toggle = document.querySelector(".create-login");
 
-    console.log("DOM ready");
-
-    console.log("all range inputs:", document.querySelectorAll('input[type="range"]'));
-    console.log("create-login:", document.querySelector(".create-login"));
-
-
-
-const storageList = {
-    "daniel": "12345678",
-    "testuser": "password"
-};
-
-
-const username = document.querySelector(".username");
-const password = document.querySelector(".password");
-const error = document.querySelector(".error");
-const form = document.getElementById("login-form");
-
-function login(username, password) {
-    const user = username.value.trim();
-    const pass = password.value.trim();
-
-    console.log("USER:", user);
-    console.log("PASS:", pass);
-
-
-    if (!(user in storageList) || storageList[user] !== pass) {
-        return "Invalid username or password.";
-    } else {
-        return "success";
+    if (!toggle) {
+        console.warn("Toggle element not found.");
     }
-}
 
-form.addEventListener("submit", (e) => {
-    e.preventDefault();
+    // Prevent dragging the range control
+    toggle.addEventListener("mousedown", e => {
+        e.preventDefault();
+    });
 
-    const result = login(username, password);
+    // Toggle between Login (0) and Create Account (1)
+    toggle.addEventListener("click", () => {
+        toggle.value = toggle.value === "0" ? "1" : "0";
+        toggle.setAttribute("value", toggle.value);
+    });
 
-    if (result === "success") {
-        window.location.href = "journal.html";
-    } else {
-        error.textContent = result;
+    async function handleAuth(mode) {
+        const user = username.value.trim();
+        const pass = password.value.trim();
+        error.textContent = "";
+
+        if (!user || !pass) {
+            error.textContent = "Username and password are required.";
+            return;
+        }
+
+        const endpoint =
+            mode === "login"
+                ? "http://localhost:3000/login"
+                : "http://localhost:3000/register";
+
+        try {
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ username: user, password: pass }),
+                credentials: "include"
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                error.textContent =
+                    data.error || data.message || "Request failed.";
+                return;
+            }
+
+            if (mode === "login") {
+                // Successful login, go to journal
+                window.location.href = "journal.html";
+            } else {
+                // Successful registration, inform user
+                error.style.color = "green";
+                error.textContent =
+                    data.message || "Account created successfully. You can now log in.";
+                // Optionally switch back to login mode
+                toggle.value = "0";
+                toggle.setAttribute("value", "0");
+            }
+        } catch (err) {
+            console.error("Auth error:", err);
+            error.textContent = "Unable to connect to server.";
+        }
     }
-})
 
-const toggle = document.querySelector(".create-login")
-console.log("toggle is", toggle);
-
-
-toggle.addEventListener("pointerdown", e => {
-    toggle.value = toggle.value === "0" ? "1" : "0";
-    toggle.setAttribute("value", toggle.value);
-});
-
+    form.addEventListener("submit", e => {
+        e.preventDefault();
+        const mode = toggle.value === "1" ? "register" : "login";
+        handleAuth(mode);
+    });
 });
