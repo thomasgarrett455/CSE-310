@@ -23,15 +23,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             headers: { "Content-Type": 'application/json'},
             body: JSON.stringify({username, content})
         });
-    })
-        
-
         if (res.ok) {
             alert("Goals saved!")
             goalInput.value = "";
         } else {
             alert("Failed to save goal")
         }
+    });
+        
+
 
 });
 
