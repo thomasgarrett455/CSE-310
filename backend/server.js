@@ -193,30 +193,38 @@ app.post('/name_current_goals', async (req, res) => {
 
 //API to add a goal to the list of goals to the db
 app.post('/add_goal', async (req, res) => {
-
-
     try {
-        const { username, content } = req.body;
+        const { username, name, content } = req.body;
+
         if (!username || !content) {
-            return res.status(400).json({error: "Missing required fields" });
+            return res.status(400).json({ error: "Missing required fields" });
         }
 
-        const [rows] = await pool.query(
-            `INSERT INTO goals (content, date, users_id, prompts_id)
-            VALUES (
-            ?,
-            CURDATE(),
-            (SELECT users_id FROM users WHERE username = ?)
-            ) `,
-            [content, username],
+        const [[user]] = await pool.query(
+            "SELECT id FROM users WHERE username = ?",
+            [username]
         );
-        if (!Array.isArray(rows) || rows.length === 0 ) {
-            return res.status(401).json({ message: 'Invalid credentials'});
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
         }
-        return res.status(200).json({ goals: rows });
+
+        const userId = user.id;
+l
+        const [result] = await pool.query(
+            `INSERT INTO goals (name, description, status, users_id)
+             VALUES (?, ?, 0, ?)`,
+            [name, content, userId]
+        );
+
+        return res.status(200).json({
+            message: "Goal saved",
+            goalId: result.insertId
+        });
+
     } catch (error) {
-        console.error("Error adding goal", error)
-        res.status(500).json({ error: "could not add"})
+        console.error("Error adding goal", error);
+        res.status(500).json({ error: "Could not add goal" });
     }
 });
 
