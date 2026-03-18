@@ -1,3 +1,4 @@
+import { getUsername } from "./auth.js";
 
 let entries = {};
   async function LoadJournalMap(username) {

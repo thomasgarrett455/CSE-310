@@ -38,10 +38,9 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const response = await fetch(endpoint, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({ username: user, password: pass }),
+                credentials: "include"
             });
 
             const data = await response.json().catch(() => ({}));

@@ -6,6 +6,8 @@
     <title>Daily Entries</title>
     <link rel="stylesheet" href="styles/main.css">
     <script type="module" src="scripts/main.js" defer></script>
+    <script type="module" src="scripts/auth.js" defer></script>
+
     <!-- <script type="module" src="scripts/goals.js"></script> -->
     <script>
         const saved = localStorage.getItem("theme");
@@ -50,13 +52,13 @@
             <section id="journalEntries">
                 <h2>Jounral Entry: </h2>
                 <textarea id="journal_entry"></textarea>
-                <button id="submit">Save Journal Entry</button>
+                <button id="submit-journal">Save Journal Entry</button>
             </section>
 
             <section id="addGoal">
                 <h2>Add Goal: </h2>
                 <textarea type="text" id="goal-creation"></textarea>
-                <button id="submit">Save Goal</button>
+                <button id="submit-goal">Save Goal</button>
             </section>
         </section>
     </main>

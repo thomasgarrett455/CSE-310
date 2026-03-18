@@ -1,3 +1,4 @@
+import { getUsername } from "./auth.js";
 
 // functoin to load the node js api, can be modified to get the specific api
 async function loadGoals() {
