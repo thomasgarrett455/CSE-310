@@ -1,16 +1,25 @@
 import { getUsername } from "./auth.js";
 
+
 let entries = {};
 
 async function LoadJournalMap(username) {
   const dateRes = await fetch("http://localhost:3000/get_journal_entry_dates", {
     method: "POST",
-    credentials: "include",   // 🔥 REQUIRED
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username })
   });
 
-  if (!dateRes.ok) return {};
+  if (dateRes.status === 401) {
+    console.warn("User has no journal entries yet.");
+    return {}; 
+  }
+
+  if (!dateRes.ok) {
+    console.error("Failed to load dates", dateRes.status);
+    return {};
+  }
 
   const dateData = await dateRes.json();
   const dates = dateData.goals.map(row => row.date);
@@ -20,10 +29,12 @@ async function LoadJournalMap(username) {
   for (const date of dates) {
     const entryRes = await fetch("http://localhost:3000/get_journal_entry", {
       method: "POST",
-      credentials: "include",   // 🔥 REQUIRED
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, date })
     });
+
+    if (entryRes.status === 401) continue;
 
     if (!entryRes.ok) continue;
 
@@ -40,6 +51,8 @@ async function LoadJournalMap(username) {
 
   return map;
 }
+
+
 
 
 
@@ -195,15 +208,32 @@ window.addEventListener("click", (e) => {
 });
 
 async function init() {
-  try {
-    entries = await LoadJournalMap("daniel");
-  } catch (error) {
-    console.error("Failed to load journal entries from server:", error);
-    entries = {};
-  }
-  if (Object.keys(entries).length === 0) {
-    // Fallback to test data if no server data
-    entries = {
+  document.addEventListener("DOMContentLoaded", async () => {
+    const username = await getUsername();
+    if (!username) {
+        console.warn("No username yet, not loading calendar");
+        return;
+    }
+
+    try {
+      entries = await LoadJournalMap(username);
+    } catch (error) {
+      console.error("Failed to load journal entries from server:", error);
+      entries = {};
+    }
+
+    // if (Object.keys(entries).length === 0) {
+    //   entries = TEST_DATA; // your fallback object
+    // }
+
+    updateCalendar();
+  });
+}
+
+init();
+
+
+const TEST_DATA = {
       "3/1/2026":
         "Entry for March 1. Testing preview slicing and calendar rendering.",
       "3/2/2026":
@@ -240,7 +270,3 @@ async function init() {
       "3/31/2026":
         "Entry for March 31. Final day of the month test entry.gggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg gggggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg ggggggggggggggggggg gggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg gggggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg ggggggggggggggggggg gggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg gggggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg ggggggggggggggggggg gggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg gggggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg ggggggggggggggggggg gggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg gggggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg ggggggggggggggggggg gggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg gggggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg ggggggggggggggggggg gggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg gggggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg ggggggggggggggggggg gggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg gggggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg ggggggggggggggggggg gggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg gggggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg ggggggggggggggggggg gggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg gggggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg ggggggggggggggggggg gggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg gggggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg ggggggggggggggggggg gggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg gggggggggggggggggggggggggggggggg ggggggggggggggggggggggggggg ggggggggggggggggggg gggggggggggggggggggggggggggggg ",
     };
-  }
-  updateCalendar();
-}
-init();
