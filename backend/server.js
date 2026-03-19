@@ -170,11 +170,6 @@ app.post('/logout', async (req, res) => {
    }
 }); 
 
-//API to get the journal prompts from the database
-app.post('/journal_prompts', async (req, res) => {
-        
-});
-
 //API to get the names of current goals from the db
 app.post('/name_current_goals', async (req, res) => {
     try{
@@ -343,17 +338,32 @@ app.post('/current_goals', async (req, res) => {
     }
 });
 
+//API to fetch journal prompts
+app.post('/journal_prompts', async (req, res) => {
+    try {
+        const [rows] = await pool.query(`SELECT prompt FROM prompts WHERE date = CURDATE()`)
 
-//DELETE ME AFTER TESTING
-app.get('/test-daily-job', async (req, res) => {
-  try {
-    console.log("Manual trigger: Starting AI task...");
-    await getDailyPrompts(); 
-    res.status(200).send("AI Task started successfully. Check your console/DB.");
-  } catch (error) {
-    res.status(500).send("Error triggering task: " + error.message);
-  }
+        if (!rows.length) {
+        return res.status(404).json({ error: "No prompts found for today" }); 
+        }
+
+        return res.status(200).json({ prompts: rows })
+
+    } catch (error) {
+        console.error("Error fetching journal prompts")
+        res.status(500).json({ error: "could not fetch prompts"})
+    }
 });
+
+// app.get('/test-daily-job', async (req, res) => {
+//   try {
+//     console.log("Manual trigger: Starting AI task...");
+//     await getDailyPrompts(); 
+//     res.status(200).send("AI Task started successfully. Check your console/DB.");
+//   } catch (error) {
+//     res.status(500).send("Error triggering task: " + error.message);
+//   }
+// });
 
 
 //This uses port 3000 to listen for api requests
