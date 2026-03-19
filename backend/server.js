@@ -10,6 +10,10 @@ import argon2 from 'argon2';
 
 import session from "express-session";
 
+import cron from 'node-cron';
+
+import { getDailyPrompts } from './services.js';
+
 //Creates a variable named app that uses express
 const app = express();
 
@@ -65,6 +69,12 @@ async function secureHash(password) {
     }
 }
 
+//cron job to run journal prompting each night
+cron.schedule('0 0 * * *', () => {
+    getDailyPrompts();
+},{
+    timezone: "America/Denver"
+});
 
 //API for registering a new user
 app.post('/register', async (req, res) => {
@@ -160,8 +170,8 @@ app.post('/logout', async (req, res) => {
    }
 }); 
 
-//API to get the journal prompt from the LLM
-app.post('/journal_prompt', async (req, res) => {
+//API to get the journal prompts from the database
+app.post('/journal_prompts', async (req, res) => {
         
 });
 
@@ -172,8 +182,6 @@ app.post('/name_current_goals', async (req, res) => {
         if (!username) {
             return res.status(400).json({error: "Username not found"});
         }
-        console.log("📥 Received username:", username); // ADD THIS
-        console.log("📥 Username type:", typeof username);
 
         const [rows] = await pool.query(
             `SELECT name
@@ -183,11 +191,7 @@ app.post('/name_current_goals', async (req, res) => {
              WHERE users.username = ?`,
             [username],
         );
-        console.log("🗄️ Raw query rows:", rows); // ADD THIS
-        console.log("🗄️ Row count:", rows.length);
-        // if (!Array.isArray(rows) || rows.length === 0 ) {
-        // return res.status(401).json({ message: 'Invalid credentials'});
-        // }
+      
         return res.status(200).json({ goals: rows });
     } catch (error) {
         console.error("Error fetching goal names", error)
@@ -338,6 +342,19 @@ app.post('/current_goals', async (req, res) => {
         res.status(500).json({ error: "could not fetch goal names"})
     }
 });
+
+
+//DELETE ME AFTER TESTING
+app.get('/test-daily-job', async (req, res) => {
+  try {
+    console.log("Manual trigger: Starting AI task...");
+    await getDailyPrompts(); 
+    res.status(200).send("AI Task started successfully. Check your console/DB.");
+  } catch (error) {
+    res.status(500).send("Error triggering task: " + error.message);
+  }
+});
+
 
 //This uses port 3000 to listen for api requests
 app.listen(3000, () => {

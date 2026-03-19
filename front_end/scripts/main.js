@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function loadCurrentGoals(username) {
-    console.log("📤 Sending username:", username);
     try {
         const res = await fetch("http://localhost:3000/name_current_goals", {
             method: "POST", 
@@ -48,14 +47,11 @@ async function loadCurrentGoals(username) {
         }
 
         const data = await res.json();
-        console.log("🎯 Goals data:", data);
 
         const goalList = document.querySelector(".goal_list");
-        console.log("📋 Goal list element:", goalList);
         goalList.innerHTML = ""
 
         data.goals.forEach(goal => {
-            console.log("➡️ Goal:", goal);
             const li = document.createElement("li");
             li.textContent = goal.name;
             goalList.appendChild(li);
