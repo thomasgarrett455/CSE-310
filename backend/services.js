@@ -10,7 +10,7 @@ export async function getDailyPrompts() {
             model: "gpt-4o",
             messages: [{ role: "user", content: `You are a journal prompt generator.
                         Your job is to produce thoughtful, reflective journal entry prompts that help the user reflect on multiple areas of life.
-                        Each response should include 2-3 journal prompts grouped across these categories:
+                        Each response should include 2 journal prompts grouped across these categories:
                         - Spiritual (or values/purpose if the user is non-religious)
                         - Mental (thought patterns, mindset, learning, clarity)
                         - Emotional (feelings, emotional processing, relationships with emotions)
@@ -25,6 +25,8 @@ export async function getDailyPrompts() {
                         - Do not give advice—only questions.
                         - Vary prompts daily so they do not feel repetitive.
                         - You may include 2 optional “wildcard” prompt that does not fit any category but encourages deep reflection.
+                        - You must include 2 journal prompts for each category
+                        - Do not include the category that the prompt is for
                         Output format:
                         - Return ONLY valid JSON:
                             {
