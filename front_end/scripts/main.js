@@ -8,29 +8,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const saveGoalBtn = document.getElementById("submit-goal"); 
     const goalInput = document.getElementById("goal-creation");
-    const goalName = document.getElementById("goalName").value.trim()
+
     saveGoalBtn.addEventListener("click", async () => {
-        const content = goalInput.value.trim();
+    const content = goalInput.value.trim();
+    const goalName = document.getElementById("goalName").value.trim(); 
 
-        if (!content) {
-            alert("Please enter a goal before saving")
-            return;
-        }
+    if (!content || !goalName) {
+        alert("Please enter a goal name and description before saving")
+        return;
+    }
 
-        const res = await fetch("http://localhost:3000/add_goal", {
-            method: "POST", 
-            credentials: "include", 
-            headers: { "Content-Type": 'application/json'},
-            body: JSON.stringify({username, goalName, content})
-        });
-        if (res.ok) {
-            alert("Goals saved!")
-            goalInput.value = "";
-            await loadCurrentGoals(username)
-        } else {
-            alert("Failed to save goal")
-        }
+    const res = await fetch("http://localhost:3000/add_goal", {
+        method: "POST", 
+        credentials: "include", 
+        headers: { "Content-Type": 'application/json'},
+        body: JSON.stringify({username, goalName, content})
     });
+
+    if (res.ok) {
+        goalInput.value = "";
+        document.getElementById("goalName").value = "";
+        await loadCurrentGoals(username)
+    } else {
+        alert("Failed to save goal")
+    }
+});
 });
 
 async function loadCurrentGoals(username) {
@@ -42,15 +44,18 @@ async function loadCurrentGoals(username) {
             body: JSON.stringify({username})
         })
 
+        
         if (!res.ok){
             return;
         }
-
+        
         const data = await res.json();
-
+        console.log(data); 
+        
         const goalList = document.querySelector(".goal_list");
         goalList.innerHTML = ""
-
+        
+        
         data.goals.forEach(goal => {
             console.log(goal);
             const li = document.createElement("li");
@@ -59,7 +64,7 @@ async function loadCurrentGoals(username) {
         });
 
     } catch(err){
-        console.error("Failed to laod goals:", err);
+        console.error("Failed to laod goal:", err);
     }
 }
 
