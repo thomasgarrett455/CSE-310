@@ -2,11 +2,25 @@ import { getUsername } from "./auth.js";
 
 // functoin to load the node js api, can be modified to get the specific api
 async function loadGoals() {
-    const response = await fetch("http://Localhost:3000/api/goals", {
+    const username = await getUsername();
+    
+    const response = await fetch("http://localhost:3000/current_goals", {
         method: "POST",
+        credentials: "include",
         headers: {"Content-Type": "application/json"}, 
-        body: JSON.stringify({})
+        body: JSON.stringify({ username })
     });
+    
+    if (response.status === 401) {
+        console.warn("User not authenticated");
+        return;
+    }
+    
+    if (!response.ok) {
+        console.error("Failed to load goals", response.status);
+        return;
+    }
+    
     const data = await response.json();
     renderGoals(data.goals);
 }
