@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles/main.css">
     <script type="module" src="scripts/main.js" defer></script>
     <script type="module" src="scripts/auth.js" defer></script>
+    <script type="module" src="scripts/darkmode.js" defer></script>
 
     <!-- <script type="module" src="scripts/goals.js"></script> -->
     <script>
@@ -52,13 +53,15 @@
             
             <section id="journalEntries">
                 <h2>Jounral Entry: </h2>
-                <textarea id="journal_entry"></textarea>
+                <textarea id="journal_entry" placeholder="Journal Entry"></textarea>
                 <button id="submit-journal">Save Journal Entry</button>
             </section>
 
             <section id="addGoal">
                 <h2>Add Goal: </h2>
-                <textarea type="text" id="goal-creation"></textarea>
+                <input type="goalName" class="goalName" placeholder="Goal Name">
+                <!-- <textentry class="goalName"></textarea> -->
+                <textarea type="text" id="goal-creation" placeholder="Goal Description"></textarea>
                 <button id="submit-goal">Save Goal</button>
             </section>
         </section>
