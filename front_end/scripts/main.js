@@ -50,14 +50,12 @@ async function loadCurrentGoals(username) {
         }
         
         const data = await res.json();
-        console.log(data); 
         
         const goalList = document.querySelector(".goal_list");
         goalList.innerHTML = ""
         
         
         data.goals.forEach(goal => {
-            console.log(goal);
             const li = document.createElement("li");
             li.textContent = goal.name;
             goalList.appendChild(li);
