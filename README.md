@@ -2,13 +2,13 @@ AI Journal APP
 ## Team Members
 Thomas Garrett, Daniel Wahlquist, Cam Woodward, Jack Murdock
 ## Software Description
-A journaling application that uses a html,css,js front end and c# with a sql database to store journal entries and goals.
+A journaling application that uses a html,css,js front end and c# with a sql database to store journal entries and goals. (Update: We have since transitioned to only using JS rather than C#.
 
 ## Architecture
 Programming Languages	
 * JavaScript
 * HTML, CSS
-* C#
+* ~~C#~~ 
 
 Frameworks	
 * ASP.NET Core
