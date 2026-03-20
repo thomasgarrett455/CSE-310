@@ -8,6 +8,7 @@
     <script type="module" src="scripts/main.js" defer></script>
     <script type="module" src="scripts/auth.js" defer></script>
     <script type="module" src="scripts/darkmode.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- <script type="module" src="scripts/goals.js"></script> -->
     <script>
@@ -40,8 +41,10 @@
         <section id="journal-form">
             <section id="aiPrompt">
                 <h2>Journal Prompt: </h2>
+                <button id="refresh-btn">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </button>
                 <p id="prompt-text"></p>
-                <button id="refresh-btn">🔄️</button>
             </section>
 
             <section id="currGoals">
@@ -60,7 +63,6 @@
             <section id="addGoal">
                 <h2>Add Goal: </h2>
                 <input type="goalName" class="goalName" placeholder="Goal Name">
-                <!-- <textentry class="goalName"></textarea> -->
                 <textarea type="text" id="goal-creation" placeholder="Goal Description"></textarea>
                 <button id="submit-goal">Save Goal</button>
             </section>

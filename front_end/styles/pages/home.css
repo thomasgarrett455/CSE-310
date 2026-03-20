@@ -28,6 +28,8 @@
         background-color: var(--secondary-color);
         border-radius: 5px;
         min-height: 150px;
+        display: grid;
+        grid-template-columns: 9fr 1fr;
     }
 
     #currGoals {
@@ -103,8 +105,7 @@
         margin: 1% 10px;
         text-decoration: underline;
         border-radius: 5px;
-        
-
+        height: 35px
     }
 
     #goal-creation {
@@ -165,6 +166,26 @@
         color: var(--secondary-color);
 }
 
+#refresh-btn {
+        background-color: transparent;
+        color: var(--fourth-color);
+        width: auto;
+        border: none;
+        font-size: 1.5rem;
+        justify-self: right;
+        height: 35px;
+        margin: 5px;
+}
+
+#refresh-btn:hover {
+color: var(--main-color);
+}
+
+#prompt-text {
+    grid-column: 1/-1;
+    grid-row: 2/4;
+
+}
 
 
 
