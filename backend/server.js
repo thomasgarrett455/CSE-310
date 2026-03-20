@@ -197,7 +197,7 @@ app.post('/name_current_goals', async (req, res) => {
 //API to add a goal to the list of goals to the db
 app.post('/add_goal', async (req, res) => {
     try {
-        const { username, name, content } = req.body;
+        const { username, goalName, content } = req.body;
 
         if (!username || !content) {
             return res.status(400).json({ error: "Missing required fields" });
@@ -216,8 +216,8 @@ app.post('/add_goal', async (req, res) => {
     
         const [result] = await pool.query(
             `INSERT INTO goals (name, description, status, users_id, created_at)
-             VALUES ("goal123", ?, 0, ?, Now())`,
-            [content, userId] //add name back in 
+             VALUES (?, ?, 0, ?, Now())`,
+            [goalName, content, userId] //add name back in 
         );
 
         return res.status(200).json({
@@ -355,15 +355,15 @@ app.post('/journal_prompts', async (req, res) => {
     }
 });
 
-// app.get('/test-daily-job', async (req, res) => {
-//   try {
-//     console.log("Manual trigger: Starting AI task...");
-//     await getDailyPrompts(); 
-//     res.status(200).send("AI Task started successfully. Check your console/DB.");
-//   } catch (error) {
-//     res.status(500).send("Error triggering task: " + error.message);
-//   }
-// });
+app.get('/test-daily-job', async (req, res) => {
+  try {
+    console.log("Manual trigger: Starting AI task...");
+    await getDailyPrompts(); 
+    res.status(200).send("AI Task started successfully. Check your console/DB.");
+  } catch (error) {
+    res.status(500).send("Error triggering task: " + error.message);
+  }
+});
 
 
 //This uses port 3000 to listen for api requests

@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const saveGoalBtn = document.getElementById("submit-goal"); 
     const goalInput = document.getElementById("goal-creation");
-
+    const goalName = document.getElementById("goalName").value.trim()
     saveGoalBtn.addEventListener("click", async () => {
         const content = goalInput.value.trim();
 
@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             method: "POST", 
             credentials: "include", 
             headers: { "Content-Type": 'application/json'},
-            body: JSON.stringify({username, content})
+            body: JSON.stringify({username, goalName, content})
         });
         if (res.ok) {
             alert("Goals saved!")
@@ -52,6 +52,7 @@ async function loadCurrentGoals(username) {
         goalList.innerHTML = ""
 
         data.goals.forEach(goal => {
+            console.log(goal);
             const li = document.createElement("li");
             li.textContent = goal.name;
             goalList.appendChild(li);
