@@ -16,9 +16,10 @@ const app = express();
 //This will allow requests that come from the frontend
 //req = request, res = response, next processes request step by step 
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
+    res.header("Access-Control-Allow-Origin", "http://localhost:5500");
     res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
     res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header("Access-Control-Allow-Credentials", "true"); 
 
     // Handle CORS preflight requests
     if (req.method === "OPTIONS") {
@@ -41,7 +42,8 @@ app.use(session({
     saveUninitialized: false, //cookie wont be created until data is stored
     cookie: {
         httpOnly: true,
-        secure: true,
+        secure: false, //process.env.SECURE_ENV,
+        sameSite: "lax",
         maxAge: 1000 * 60 * 60
     }
 
@@ -106,15 +108,25 @@ app.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid Credentials' });
         }
         const user = rows[0];
-        const isPasswordValid = await argon2.verify(user.password, password);
+        const isPasswordValid = await argon2.verify(user.password_hash, password);
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid Credentials'});
         }
+        req.session.username = user.username
+        console.log("✅ Session after login:", req.session);
         res.json({ message: 'Login Successful'});
     } catch (error) {
         console.error("Login error: ", error);
         res.status(500).json({ error: "Internal server error"});
     }
+});
+
+app.get('/me', (req, res) => {
+    
+    if (!req.session.username) {
+        return res.status(401).json({error: "Not logged in" });
+}
+    res.json({ username: req.session.username})
 });
 
 //API for user logout
@@ -194,7 +206,7 @@ app.post('/add_goal', async (req, res) => {
             VALUES (
             ?,
             CURDATE(),
-            (SELECT users_id FROM users WHERE username = ?),
+            (SELECT users_id FROM users WHERE username = ?)
             ) `,
             [content, username],
         );

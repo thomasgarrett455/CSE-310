@@ -81,7 +81,7 @@ input[type="password"] {
     border: 2px solid var(--main-color);
     background: white;
     font-size: 1rem;
-    color: var(--text);
+    color: var(--fourth-color);
     justify-self: center;
     display: flex;
     justify-self: right;
