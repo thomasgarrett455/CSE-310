@@ -10,6 +10,10 @@ import argon2 from 'argon2';
 
 import session from "express-session";
 
+import cron from 'node-cron';
+
+import { getDailyPrompts } from './services.js';
+
 //Creates a variable named app that uses express
 const app = express();
 
@@ -65,6 +69,12 @@ async function secureHash(password) {
     }
 }
 
+//cron job to run journal prompting each night
+cron.schedule('0 0 * * *', () => {
+    getDailyPrompts();
+},{
+    timezone: "America/Denver"
+});
 
 //API for registering a new user
 app.post('/register', async (req, res) => {
@@ -160,11 +170,6 @@ app.post('/logout', async (req, res) => {
    }
 }); 
 
-//API to get the journal prompt from the LLM
-app.post('/journal_prompt', async (req, res) => {
-        
-});
-
 //API to get the names of current goals from the db
 app.post('/name_current_goals', async (req, res) => {
     try{
@@ -174,16 +179,14 @@ app.post('/name_current_goals', async (req, res) => {
         }
 
         const [rows] = await pool.query(
-            `SELECT goals.name
+            `SELECT name
              FROM goals
              JOIN users
              ON goals.users_id = users.users_id
              WHERE users.username = ?`,
             [username],
         );
-        if (!Array.isArray(rows) || rows.length === 0 ) {
-            return res.status(401).json({ message: 'Invalid credentials'});
-        }
+      
         return res.status(200).json({ goals: rows });
     } catch (error) {
         console.error("Error fetching goal names", error)
@@ -193,30 +196,38 @@ app.post('/name_current_goals', async (req, res) => {
 
 //API to add a goal to the list of goals to the db
 app.post('/add_goal', async (req, res) => {
-
-
     try {
-        const { username, content } = req.body;
+        const { username, name, content } = req.body;
+
         if (!username || !content) {
-            return res.status(400).json({error: "Missing required fields" });
+            return res.status(400).json({ error: "Missing required fields" });
         }
 
-        const [rows] = await pool.query(
-            `INSERT INTO goals (content, date, users_id, prompts_id)
-            VALUES (
-            ?,
-            CURDATE(),
-            (SELECT users_id FROM users WHERE username = ?)
-            ) `,
-            [content, username],
+        const [[user]] = await pool.query(
+            "SELECT users_id FROM users WHERE username = ?",
+            [username]
         );
-        if (!Array.isArray(rows) || rows.length === 0 ) {
-            return res.status(401).json({ message: 'Invalid credentials'});
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
         }
-        return res.status(200).json({ goals: rows });
+
+        const userId = user.users_id;
+    
+        const [result] = await pool.query(
+            `INSERT INTO goals (name, description, status, users_id, created_at)
+             VALUES ("goal123", ?, 0, ?, Now())`,
+            [content, userId] //add name back in 
+        );
+
+        return res.status(200).json({
+            message: "Goal saved",
+            goalId: result.insertId
+        });
+
     } catch (error) {
-        console.error("Error adding goal", error)
-        res.status(500).json({ error: "could not add"})
+        console.error("Error adding goal", error);
+        res.status(500).json({ error: "Could not add goal" });
     }
 });
 
@@ -326,6 +337,34 @@ app.post('/current_goals', async (req, res) => {
         res.status(500).json({ error: "could not fetch goal names"})
     }
 });
+
+//API to fetch journal prompts
+app.post('/journal_prompts', async (req, res) => {
+    try {
+        const [rows] = await pool.query(`SELECT prompt FROM prompts WHERE date = CURDATE()`)
+
+        if (!rows.length) {
+        return res.status(404).json({ error: "No prompts found for today" }); 
+        }
+
+        return res.status(200).json({ prompts: rows })
+
+    } catch (error) {
+        console.error("Error fetching journal prompts")
+        res.status(500).json({ error: "could not fetch prompts"})
+    }
+});
+
+// app.get('/test-daily-job', async (req, res) => {
+//   try {
+//     console.log("Manual trigger: Starting AI task...");
+//     await getDailyPrompts(); 
+//     res.status(200).send("AI Task started successfully. Check your console/DB.");
+//   } catch (error) {
+//     res.status(500).send("Error triggering task: " + error.message);
+//   }
+// });
+
 
 //This uses port 3000 to listen for api requests
 app.listen(3000, () => {
