@@ -1,6 +1,9 @@
 import { getUsername } from "./auth.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
+    document.getElementById("refresh-btn").addEventListener("click", refreshPrompt);
+    const submitBtn = document.getElementById("submit-journal");
+
     const username = await getUsername();
     if (!username) return;
 
@@ -32,8 +35,50 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
         alert("Failed to save goal")
     }
+    });
+    submitBtn.addEventListener('click', async () => {
+        const journalEntry = document.getElementById("journal_entry").value.trim();
+
+        if (!journalEntry) {
+        alert("Please write something before saving.");
+        return;
+        }
+
+        const username = await getUsername();
+        saveJournal(username, journalEntry);
+    })
 });
-});
+
+
+
+async function saveJournal(username, journalEntry) {
+    try {
+        const prompts_id = getPromptId()
+        const res = await fetch("http://localhost:3000/journal_entry", {
+            method: "POST", 
+            credentials: "include", 
+            headers: { "Content-Type": "application/json"},
+            body: JSON.stringify({username, journalEntry, prompts_id})
+        })
+
+        if (!res.ok){
+            return;
+        }
+        
+        else if (res.ok){
+            alert("Journal entry saved!")
+            document.getElementById("journal_entry").value = "";
+        };
+
+    } catch (error) {
+        console.error("Failed to save journal entry:", error )
+    }
+
+}
+
+function getPromptId() {
+    return prompts[promptIndex].prompts_id;
+}
 
 async function loadCurrentGoals(username) {
     try {
@@ -105,7 +150,6 @@ function refreshPrompt() {
     displayPrompt();
 }
 
-document.getElementById("refresh-btn").addEventListener("click", refreshPrompt);
 
 loadCurrentPrompt();
 
