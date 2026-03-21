@@ -234,7 +234,7 @@ app.post('/add_goal', async (req, res) => {
 //API to save journal entry to db 
 app.post('/journal_entry', async (req, res) => {
     try{
-        const { username, content, prompt } = req.body;
+        const { username, journalEntry, prompts_id } = req.body;
         if (!username) {
             return res.status(400).json({error: "Username not found"});
         }
@@ -245,14 +245,12 @@ app.post('/journal_entry', async (req, res) => {
             ?,
             CURDATE(),
             (SELECT users_id FROM users WHERE username = ?),
-            (SELECT prompt_id FROM prompts WHERE prompt = ?)
+            ?
             ) `,
-            [content, username, prompt],
+            [journalEntry, username, prompts_id],
         );
-        if (!Array.isArray(rows) || rows.length === 0 ) {
-            return res.status(401).json({ message: 'Invalid credentials'});
-        }
         return res.status(200).json({ goals: rows });
+
     } catch (error) {
         console.error("Error saving journal entry", error)
         res.status(500).json({ error: "could not save journal entry"})
@@ -341,13 +339,33 @@ app.post('/current_goals', async (req, res) => {
 //API to fetch journal prompts
 app.post('/journal_prompts', async (req, res) => {
     try {
-        const [rows] = await pool.query(`SELECT prompt FROM prompts WHERE date = CURDATE()`)
+        const [rows] = await pool.query(`SELECT prompt, prompts_id FROM prompts WHERE date = CURDATE()`)
 
         if (!rows.length) {
         return res.status(404).json({ error: "No prompts found for today" }); 
         }
 
         return res.status(200).json({ prompts: rows })
+
+    } catch (error) {
+        console.error("Error fetching journal prompts")
+        res.status(500).json({ error: "could not fetch prompts"})
+    }
+});
+
+app.post('/journal_prompts_id', async (req, res) => {
+    try {
+        const { prompt } = req.body;
+
+        const [rows] = await pool.query(`SELECT prompts_id FROM prompts WHERE date = CURDATE() AND content = ?`,
+            [prompt]
+        )
+
+        if (!rows.length) {
+        return res.status(404).json({ error: "No prompts found for today" }); 
+        }
+
+        return res.status(200).json({ prompts_id: rows[0].prompts_id })
 
     } catch (error) {
         console.error("Error fetching journal prompts")
