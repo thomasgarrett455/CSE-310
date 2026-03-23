@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("refresh-btn").addEventListener("click", refreshPrompt);
     const submitBtn = document.getElementById("submit-journal");
 
+
     const username = await getUsername();
     if (!username) return;
 
@@ -152,5 +153,5 @@ function refreshPrompt() {
 
 
 loadCurrentPrompt();
-await loadCurrentGoals(getUsername());
+await loadCurrentGoals(await getUsername());
 
