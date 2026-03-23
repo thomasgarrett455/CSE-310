@@ -152,5 +152,5 @@ function refreshPrompt() {
 
 
 loadCurrentPrompt();
-
+await loadCurrentGoals(getUsername());
 
