@@ -375,13 +375,11 @@ app.post('/update_goal_status', async (req, res) => {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
-        const completedAt = status === 1 ? new Date() : null;
-
         const [result] = await pool.query(
             `UPDATE goals 
-             SET status = ?, completed_at = ?
+             SET status = ?, completed_by = CURDATE()
              WHERE name = ? AND users_id = (SELECT users_id FROM users WHERE username = ?)`,
-            [status, completedAt, goalName, username]
+            [status, goalName, username]
         );
 
         if (result.affectedRows === 0) {
