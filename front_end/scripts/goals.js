@@ -1,6 +1,6 @@
 import { getUsername } from "./auth.js";
 
-// functoin to load the node js api, can be modified to get the specific api
+// function to load the node js api, can be modified to get the specific api
 async function loadGoals() {
     const username = await getUsername();
     
@@ -98,20 +98,4 @@ function renderGoals(goals) {
     });
 }
 
-// test goals for reandering, 
-
-// renderGoals([
-//     {
-//         name: "Test Goal A",
-//         dateCreated: "2/25/2026",
-//         description: "This is a test goal.",
-//         dateComplete: ""
-//     },
-//     {
-//         name: "Test Goal B",
-//         dateCreated: "1/24/2026",
-//         description: "Another test goal.",
-//         dateComplete: "2/25/2026"
-//     }
-// ]);
 
