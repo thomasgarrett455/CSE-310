@@ -183,7 +183,7 @@ app.post('/name_current_goals', async (req, res) => {
              FROM goals
              JOIN users
              ON goals.users_id = users.users_id
-             WHERE users.username = ?`,
+             WHERE users.username = ? AND goals.status = 0`,
             [username],
         );
         if (!Array.isArray(rows) || rows.length === 0 ) {
@@ -314,31 +314,6 @@ app.post('/get_journal_entry', async (req, res) => {
     }
 });
 
-app.post('/current_goals', async (req, res) => {
-    try{
-        const { username } = req.body;
-        if (!username) {
-            return res.status(400).json({error: "Username not found"});
-        }
-
-        const [rows] = await pool.query(
-            `SELECT goals.name, goals.description
-             FROM goals
-             JOIN users
-             ON goals.users_id = users.users_id
-             WHERE users.username = ?`,
-            [username],
-        );
-        if (!Array.isArray(rows) || rows.length === 0 ) {
-            return res.status(401).json({ message: 'Invalid credentials'});
-        }
-        return res.status(200).json({ goals: rows });
-    } catch (error) {
-        console.error("Error fetching goal names", error)
-        res.status(500).json({ error: "could not fetch goal names"})
-    }
-});
-
 //API to get full goal details (with dates) for the goals page
 app.post('/goals_full', async (req, res) => {
     try{
@@ -348,7 +323,7 @@ app.post('/goals_full', async (req, res) => {
         }
 
         const [rows] = await pool.query(
-            `SELECT goals.name, goals.description, goals.created_at
+            `SELECT goals.name, goals.description, goals.created_at, goals.status
              FROM goals
              JOIN users
              ON goals.users_id = users.users_id
