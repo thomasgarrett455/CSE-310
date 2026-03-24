@@ -1,6 +1,5 @@
 import { getUsername } from "./auth.js";
 
-
 let entries = {};
 
 async function LoadJournalMap(username) {
@@ -10,32 +9,43 @@ async function LoadJournalMap(username) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username })
   });
-
+  
   if (dateRes.status === 401) {
     console.warn("User has no journal entries yet.");
-    return {}; 
+    return {};
   }
-
+  
   if (!dateRes.ok) {
     console.error("Failed to load dates", dateRes.status);
     return {};
   }
-
+  
   const dateData = await dateRes.json();
   const dates = dateData.goals.map(row => row.date);
+  console.log("LoadJournalMap starting", dates);
 
   const map = {};
 
   for (const date of dates) {
+
+    // ---------------------------------------------------------
+    // FIX: Extract date part from ISO timestamp for SQL match
+    // ---------------------------------------------------------
+    const d = new Date(date);   // still needed for display key
+    const isoDate = date.split('T')[0];  // Extract YYYY-MM-DD from timestamp
+    // ---------------------------------------------------------
+
     const entryRes = await fetch("http://localhost:3000/get_journal_entry", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, date })
+      body: JSON.stringify({
+        username,
+        date: isoDate   // Send just date part (YYYY-MM-DD)
+      })
     });
 
     if (entryRes.status === 401) continue;
-
     if (!entryRes.ok) continue;
 
     const entryData = await entryRes.json();
@@ -43,8 +53,11 @@ async function LoadJournalMap(username) {
 
     const content = entryData.goals[0].content;
 
-    const d = new Date(date);
+    // -------------------------------------------------------
+    // FIX: Calendar keys stay in M/D/YYYY (your display format)
+    // -------------------------------------------------------
     const key = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+    // -------------------------------------------------------
 
     map[key] = content;
   }
@@ -54,41 +67,32 @@ async function LoadJournalMap(username) {
 
 
 
-
-
-
-// testing journal icons:
-const journalDates = ["3/4/2026", "3/7/2026", "3/12/2026"];
-
 // Calendar logic code
 function loadCalendar(year, month) {
   const calendar = document.getElementById("calendar");
   calendar.querySelectorAll(".day").forEach((d) => d.remove());
 
-  // gets the first day of the month, the numebr of days, and the last day.
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const lastDay = new Date(year, month, daysInMonth).getDay();
 
-  // puts in the correct numebr of epmty cells before the first day
   const daysafter = 6 - lastDay;
 
-  // starts the celendar after the empty cells
   for (let i = 0; i < firstDay; i++) {
     const empty = document.createElement("div");
     empty.classList.add("day");
     calendar.appendChild(empty);
   }
-  // add the days of the month, after the empty cells
+
   for (let day = 1; day <= daysInMonth; day++) {
     const cell = document.createElement("div");
     cell.classList.add("day");
     cell.innerHTML = `
       <div class="day-number">${day}</div>
-      `;
+    `;
     calendar.appendChild(cell);
   }
-  // creates a number of empty cells after the last day to fill the rest of that week
+
   for (let i = 0; i < daysafter; i++) {
     const trailing = document.createElement("div");
     trailing.classList.add("day", "trailing");
@@ -97,80 +101,20 @@ function loadCalendar(year, month) {
 }
 
 
-  // calendar month picker logic
-  let today = new Date();
-  let currentYear = today.getFullYear();
-  let currentMonth = today.getMonth();
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  // event listeners for the month navigation buttons
-
-  // previous button logic, with previous year as well
-  document.getElementById("prevMonth").addEventListener("click", () => {
-    currentMonth--;
-    if (currentMonth < 0) {
-      currentMonth = 11;
-      currentYear--;
-    }
-    updateCalendar();
-  });
-  // next month button logic, with next year as well
-  document.getElementById("nextMonth").addEventListener("click", () => {
-    currentMonth++;
-    if (currentMonth > 11) {
-      currentMonth = 0;
-      currentYear++;
-    }
-    updateCalendar();
-  });
-
-  // function to actually load the calendar with the month and year display
-  function updateCalendar() {
-    loadCalendar(currentYear, currentMonth);
-    document.getElementById("yearDisplay").textContent =
-      `${monthNames[currentMonth]} ${currentYear}`;
-
-    markJournalDays(currentYear, currentMonth);
-  }
-  // returns to the current month and year when return button is pressed
-  document.getElementById("return").addEventListener("click", () => {
-    currentMonth = today.getMonth();
-    currentYear = today.getFullYear();
-    updateCalendar();
-  });
-
-  // calendar dropdown logic, allows use to choose month and year
-  const monthInput = document.querySelector(".calendar-dropdown");
-
-  monthInput.addEventListener("change", () => {
-    const [year, month] = monthInput.value.split("-");
-    currentYear = Number(year);
-    currentMonth = Number(month) - 1;
-    updateCalendar();
-  });
-
 
 // marks the journal with text from the entry
-
 function markJournalDays(year, month) {
   const cells = document.querySelectorAll("#calendar .day");
 
   cells.forEach((cell) => {
-    const day = Number(cell.textContent);
-    if (!day) return;
+
+    // ---------------------------------------------------------
+    // FIX: Read only the number, not the preview text
+    // ---------------------------------------------------------
+    const dayNum = cell.querySelector(".day-number");
+    if (!dayNum) return;
+    const day = Number(dayNum.textContent);
+    // ---------------------------------------------------------
 
     const key = `${month + 1}/${day}/${year}`;
     const entry = entries[key];
@@ -181,13 +125,15 @@ function markJournalDays(year, month) {
       cell.innerHTML = `
         <div class="day-number">${day}</div>
         <div class="day-preview">${preview}</div>
-        `;
+      `;
       cell.addEventListener("click", () => {
         openJournalModal(key, entry);
       });
     }
   });
 }
+
+
 
 function openJournalModal(dateKey, fullText) {
   document.getElementById("modalDate").textContent = dateKey;
@@ -207,30 +153,73 @@ window.addEventListener("click", (e) => {
   }
 });
 
-async function init() {
-  document.addEventListener("DOMContentLoaded", async () => {
-    const username = await getUsername();
-    if (!username) {
-        console.warn("No username yet, not loading calendar");
-        return;
-    }
+// calendar month picker logic
+let today = new Date();
+let currentYear = today.getFullYear();
+let currentMonth = today.getMonth();
+const monthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
 
-    try {
-      entries = await LoadJournalMap(username);
-    } catch (error) {
-      console.error("Failed to load journal entries from server:", error);
-      entries = {};
-    }
-
-    // if (Object.keys(entries).length === 0) {
-    //   entries = TEST_DATA; // your fallback object
-    // }
-
-    updateCalendar();
-  });
+function updateCalendar() {
+  loadCalendar(currentYear, currentMonth);
+  document.getElementById("yearDisplay").textContent = `${monthNames[currentMonth]} ${currentYear}`;
+  markJournalDays(currentYear, currentMonth);
 }
 
-init();
+// Navigation buttons
+document.getElementById("prevMonth").addEventListener("click", () => {
+  currentMonth--;
+  if (currentMonth < 0) {
+    currentMonth = 11;
+    currentYear--;
+  }
+  updateCalendar();
+});
+
+document.getElementById("nextMonth").addEventListener("click", () => {
+  currentMonth++;
+  if (currentMonth > 11) {
+    currentMonth = 0;
+    currentYear++;
+  }
+  updateCalendar();
+});
+
+document.getElementById("return").addEventListener("click", () => {
+  currentMonth = today.getMonth();
+  currentYear = today.getFullYear();
+  updateCalendar();
+});
+
+const monthInput = document.querySelector(".calendar-dropdown");
+monthInput.addEventListener("change", () => {
+  const [year, month] = monthInput.value.split("-");
+  currentYear = Number(year);
+  currentMonth = Number(month) - 1;
+  updateCalendar();
+});
+
+
+
+// DOMContentLoaded init
+document.addEventListener("DOMContentLoaded", async () => {
+  const username = await getUsername();
+  if (!username) {
+    console.warn("No username yet, not loading calendar");
+    return;
+  }
+
+  try {
+    entries = await LoadJournalMap(username);
+  } catch (error) {
+    console.error("Failed to load journal entries from server:", error);
+    entries = {};
+  }
+
+  updateCalendar();
+});
 
 
 const TEST_DATA = {

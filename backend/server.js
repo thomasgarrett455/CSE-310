@@ -278,7 +278,7 @@ app.post('/get_journal_entry_dates', async (req, res) => {
             [username],
         );
         if (!Array.isArray(rows) || rows.length === 0 ) {
-            return res.status(401).json({ message: 'Invalid credentials'});
+            return res.status(200).json({ goals: [] });
         }
         return res.status(200).json({ goals: rows });
     } catch (error) {
@@ -305,7 +305,7 @@ app.post('/get_journal_entry', async (req, res) => {
             [username, date],
         );
         if (!Array.isArray(rows) || rows.length === 0 ) {
-            return res.status(401).json({ message: 'Invalid credentials'});
+            return res.status(200).json({ goals: [] });
         }
         return res.status(200).json({ goals: rows });
     } catch (error) {
@@ -313,7 +313,7 @@ app.post('/get_journal_entry', async (req, res) => {
         res.status(500).json({ error: "could not fetch journal entries"})
     }
 });
-
+ 
 app.post('/current_goals', async (req, res) => {
     try{
         const { username } = req.body;
@@ -338,6 +338,8 @@ app.post('/current_goals', async (req, res) => {
         res.status(500).json({ error: "could not fetch goal names"})
     }
 });
+
+
 
 //API to get full goal details (with dates) for the goals page
 app.post('/goals_full', async (req, res) => {
@@ -394,6 +396,8 @@ app.post('/update_goal_status', async (req, res) => {
         res.status(500).json({ error: "Could not update goal" });
     }
 });
+
+
 
 //API to fetch journal prompts
 app.post('/journal_prompts', async (req, res) => {
