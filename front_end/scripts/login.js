@@ -46,6 +46,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json().catch(() => ({}));
 
             if (!response.ok) {
+
+                if (response.status === 409) {
+                    error.textContent = "That username is already taken. Please choose another.";
+                    alert("That username is already taken.");
+                    return;
+                }
                 error.textContent =
                     data.error || data.message || "Request failed.";
                 return;

@@ -11,28 +11,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     const saveGoalBtn = document.getElementById("submit-goal"); 
     const goalInput = document.getElementById("goal-creation");
     const logoutBtn = document.getElementById("logout-btn");
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", async () => {
-            try {
-                // backend to destroy the session cookie
-                const res = await fetch("http://localhost:3000/logout", {
-                    method: "POST",
-                    credentials: "include", 
-                    headers: { "Content-Type": "application/json" }
-                });
+    // if (logoutBtn) {
+    //     logoutBtn.addEventListener("click", async () => {
+    //         try {
+    //             // backend to destroy the session cookie
+    //             const res = await fetch("http://localhost:3000/logout", {
+    //                 method: "POST",
+    //                 credentials: "include", 
+    //                 headers: { "Content-Type": "application/json" }
+    //             });
 
-                //  redirect to the login page
-                if (res.ok) {
-                    window.location.href = "index.html";
-                } else {
-                    console.error("Server failed to log out.");
-                    alert("Trouble logging out. Please try again.");
-                }
-            } catch (err) {
-                console.error("Network error during logout:", err);
-            }
-        });
-    }
+    //             //  redirect to the login page
+    //             if (res.ok) {
+    //                 window.location.href = "index.html";
+    //             } else {
+    //                 console.error("Server failed to log out.");
+    //                 alert("Trouble logging out. Please try again.");
+    //             }
+    //         } catch (err) {
+    //             console.error("Network error during logout:", err);
+    //         }
+    //     });
+    // }
 
     saveGoalBtn.addEventListener("click", async () => {
     const content = goalInput.value.trim();
