@@ -6,6 +6,7 @@
     <title>Document</title>
     <link rel="stylesheet" href="styles/main.css">
     <script type="module" src="scripts/darkmode.js" defer></script>
+    <link rel="stylesheet" href="styles/main.css" />
     <script>
         const saved = localStorage.getItem("theme");
         if (saved === "1") {
@@ -29,7 +30,7 @@
                 <!-- <li><a href=""></a></li> -->
             </ul>
             <input type="range" class="toggle-range" id="darktoggle" min="0" max="1" step="1" value="0">
-            <button class="login-button"><a href="index.html">Logout</a></button>
+            <button id="logout-btn" class="logout-button">Logout</button>
         </nav>
     </header>
     <main>
