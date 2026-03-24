@@ -79,7 +79,7 @@ nav ul li a:hover {
 }
 
 .login-button {
-    margin-top: 10px;
+    margin-top: 20px;
     display: flex;
     justify-self: flex-end;
     background-color: var(--main-color);

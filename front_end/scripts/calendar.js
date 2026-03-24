@@ -28,12 +28,9 @@ async function LoadJournalMap(username) {
 
   for (const date of dates) {
 
-    // ---------------------------------------------------------
-    // FIX: Extract date part from ISO timestamp for SQL match
-    // ---------------------------------------------------------
-    const d = new Date(date);   // still needed for display key
-    const isoDate = date.split('T')[0];  // Extract YYYY-MM-DD from timestamp
-    // ---------------------------------------------------------
+    const d = new Date(date);  
+    const isoDate = date.split('T')[0]; 
+
 
     const entryRes = await fetch("http://localhost:3000/get_journal_entry", {
       method: "POST",
@@ -41,7 +38,7 @@ async function LoadJournalMap(username) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username,
-        date: isoDate   // Send just date part (YYYY-MM-DD)
+        date: isoDate   
       })
     });
 
@@ -53,11 +50,8 @@ async function LoadJournalMap(username) {
 
     const content = entryData.goals[0].content;
 
-    // -------------------------------------------------------
-    // FIX: Calendar keys stay in M/D/YYYY (your display format)
-    // -------------------------------------------------------
     const key = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
-    // -------------------------------------------------------
+
 
     map[key] = content;
   }
@@ -108,13 +102,10 @@ function markJournalDays(year, month) {
 
   cells.forEach((cell) => {
 
-    // ---------------------------------------------------------
-    // FIX: Read only the number, not the preview text
-    // ---------------------------------------------------------
     const dayNum = cell.querySelector(".day-number");
     if (!dayNum) return;
     const day = Number(dayNum.textContent);
-    // ---------------------------------------------------------
+
 
     const key = `${month + 1}/${day}/${year}`;
     const entry = entries[key];
