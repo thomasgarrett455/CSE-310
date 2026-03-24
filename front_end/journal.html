@@ -6,6 +6,7 @@
     <title>Daily Entries</title>
     <link rel="stylesheet" href="styles/main.css">
     <script type="module" src="scripts/main.js" defer></script>
+    <script type="module" src="scripts/logout.js" defer></script>
     <script type="module" src="scripts/auth.js" defer></script>
     <script type="module" src="scripts/darkmode.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -34,7 +35,7 @@
                 <!-- <li><a href=""></a></li> -->
             </ul>
             <input type="range" class="toggle-range" id="darktoggle" min="0" max="1" step="1" value="0">
-            <button class="login-button"><a href="index.html">Logout</a></button>
+            <button id="logout-btn" class="logout-button">Logout</button>
         </nav>
     </header>
     <main>
@@ -71,7 +72,7 @@
     </main>
     <footer class="site-footer">
         <p>&copy; 2026 journal app</p>
-        <a href="about-us.html">About Us</a>
+        <!-- <a href="about-us.html">About Us</a> -->
     </footer>
 </body>
 </html>

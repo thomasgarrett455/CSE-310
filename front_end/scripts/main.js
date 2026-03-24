@@ -1,5 +1,3 @@
-console.log("✅ main.js loaded")
-
 import { getUsername } from "./auth.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -12,10 +10,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const saveGoalBtn = document.getElementById("submit-goal"); 
     const goalInput = document.getElementById("goal-creation");
+    const logoutBtn = document.getElementById("logout-btn");
+    // if (logoutBtn) {
+    //     logoutBtn.addEventListener("click", async () => {
+    //         try {
+    //             // backend to destroy the session cookie
+    //             const res = await fetch("http://localhost:3000/logout", {
+    //                 method: "POST",
+    //                 credentials: "include", 
+    //                 headers: { "Content-Type": "application/json" }
+    //             });
+
+    //             //  redirect to the login page
+    //             if (res.ok) {
+    //                 window.location.href = "index.html";
+    //             } else {
+    //                 console.error("Server failed to log out.");
+    //                 alert("Trouble logging out. Please try again.");
+    //             }
+    //         } catch (err) {
+    //             console.error("Network error during logout:", err);
+    //         }
+    //     });
+    // }
 
     saveGoalBtn.addEventListener("click", async () => {
     const content = goalInput.value.trim();
     const goalName = document.getElementById("goalName").value.trim(); 
+
+
 
     if (!content || !goalName) {
         alert("Please enter a goal name and description before saving")
@@ -88,27 +111,35 @@ async function loadCurrentGoals(username) {
             credentials: "include",
             headers: { "Content-Type": "application/json"},
             body: JSON.stringify({username})
-        })
+        });
 
+        // Grab the list element early
+        const goalList = document.querySelector(".goal_list");
         
-        if (!res.ok){
+        // Clear the list immediately so no default HTML bullets remain
+        goalList.innerHTML = ""; 
+
+        if (!res.ok) {
+            return; 
+        }
+
+        const data = await res.json();
+        
+        // Check if data.goals exists and actually has items
+        if (!data.goals || data.goals.length === 0) {
             return;
         }
         
-        const data = await res.json();
-        
-        const goalList = document.querySelector(".goal_list");
-        goalList.innerHTML = ""
-        
-        
         data.goals.forEach(goal => {
-            const li = document.createElement("li");
-            li.textContent = goal.name;
-            goalList.appendChild(li);
+            if (goal.name && goal.name.trim() !== "") {
+                const li = document.createElement("li");
+                li.textContent = goal.name;
+                goalList.appendChild(li);
+            }
         });
 
     } catch(err){
-        console.error("Failed to laod goal:", err);
+        console.error("Failed to load goals:", err);
     }
 }
 
