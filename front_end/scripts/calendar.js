@@ -15,30 +15,28 @@ async function LoadJournalMap(username) {
   const map = {};
 
   for (const rawDate of dates) {
-    // 1. Manually extract the numbers from the string
     const [year, month, day] = rawDate.split('T')[0].split('-').map(Number);
     const key = `${month}/${day}/${year}`;
-
     const isoDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    
-    const entryRes = await fetch("/api/get_journal_entry_dates", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username })
+
+    const entryRes = await fetch("/api/get_journal_entry", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, date: isoDate })
     });
 
     if (!entryRes.ok) continue;
     const entryData = await entryRes.json();
-    
-    let content = entryData.entry?.content || (entryData.goals?.[0]?.content);
-    let prompt = entryData.entry?.prompt || "";
+
+    const content = entryData.entry?.content;
+    const prompt = entryData.entry?.prompt || "";
 
     if (content) {
         map[key] = { content, prompt };
     }
-  }
-  return map;
+}
+return map;
 }
 
 
