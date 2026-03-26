@@ -17,7 +17,7 @@ async function LoadJournalMap(username) {
   for (const rawDate of dates) {
     // 1. Manually extract the numbers from the string
     const [year, month, day] = rawDate.split('T')[0].split('-').map(Number);
-    const key = `${month}/${day}/${year}`;
+    const key = `${month}/${day + 1}/${year}`;
     
     console.log(`DB String: ${rawDate} | Generated Key: ${key}`); // <-- WATCH THIS IN CONSOLE
 
@@ -97,7 +97,7 @@ function markJournalDays(year, month) {
       const preview = entry.content.slice(0, 50);
       cell.classList.add("has-entry");
       cell.innerHTML = `
-        <div class="day-number">${day + 1}</div>
+        <div class="day-number">${day}</div>
         <div class="day-preview">${preview}</div>
       `;
       cell.addEventListener("click", () => {
