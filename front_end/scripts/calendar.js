@@ -3,21 +3,24 @@ import { getUsername } from "./auth.js";
 let entries = {};
 
 async function LoadJournalMap(username) {
-  // ... (keep your fetch logic at the top)
+  const dateRes = await fetch("/api/get_journal_entry_dates", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username })
+  });
 
   const dateData = await dateRes.json();
   const dates = dateData.goals.map(row => row.date);
   const map = {};
 
   for (const rawDate of dates) {
-    // 1. Parse the string manually to ignore the "Z" and the timezone
-    // This turns "2026-03-26T00:00:00.000Z" into [2026, 03, 26]
+    // 1. Manually extract the numbers from the string
     const [year, month, day] = rawDate.split('T')[0].split('-').map(Number);
-    
-    // 2. Build the key using literal numbers (3/26/2026)
     const key = `${month}/${day}/${year}`;
     
-    // 3. Keep the ISO date for your API call
+    console.log(`DB String: ${rawDate} | Generated Key: ${key}`); // <-- WATCH THIS IN CONSOLE
+
     const isoDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     
     const entryRes = await fetch("/api/get_journal_entry", {
@@ -28,25 +31,17 @@ async function LoadJournalMap(username) {
     });
 
     if (!entryRes.ok) continue;
-
     const entryData = await entryRes.json();
-    let content = null;
-    let prompt = null;
+    
+    let content = entryData.entry?.content || (entryData.goals?.[0]?.content);
+    let prompt = entryData.entry?.prompt || "";
 
-    if (entryData.entry) {
-        content = entryData.entry.content;
-        prompt = entryData.entry.prompt;
+    if (content) {
+        map[key] = { content, prompt };
     }
-
-    if (!content) continue;
-
-    // IMPORTANT: Make sure there is NO OTHER 'key =' assignment below this!
-    map[key] = { content, prompt };
   }
-
   return map;
 }
-
 
 
 // Calendar logic code
