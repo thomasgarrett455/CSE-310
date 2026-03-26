@@ -97,7 +97,7 @@ function markJournalDays(year, month) {
       const preview = entry.content.slice(0, 50);
       cell.classList.add("has-entry");
       cell.innerHTML = `
-        <div class="day-number">${day}</div>
+        <div class="day-number">${day + 1}</div>
         <div class="day-preview">${preview}</div>
       `;
       cell.addEventListener("click", () => {
