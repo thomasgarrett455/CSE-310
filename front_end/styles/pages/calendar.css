@@ -69,7 +69,6 @@ main {
 }
 
 #calendar {
-    /* font-family: Arial, Helvetica, sans-serif; */
     height: auto;
     border: 2px solid var(--fourth-color);
     display: grid;
@@ -148,15 +147,26 @@ main {
     overflow-wrap: break-word;
 }
 
-.close {
-    float: right;
-    font-size: 3rem;
-    color: var(--fourth-color);
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
 }
 
-.close:hover {
-    color: var(--secondary-color);
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    color: var(--fourth-color);
     cursor: pointer;
+    margin-right: 2%;
 }
+
+.close-btn:hover {
+    color: var(--secondary-color);
+}
+
 
 }

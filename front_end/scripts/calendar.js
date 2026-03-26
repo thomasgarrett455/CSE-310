@@ -30,8 +30,7 @@ async function LoadJournalMap(username) {
 
     const d = new Date(date);  
     const isoDate = date.split('T')[0]; 
-
-
+    
     const entryRes = await fetch("http://localhost:3000/get_journal_entry", {
       method: "POST",
       credentials: "include",
@@ -41,19 +40,28 @@ async function LoadJournalMap(username) {
         date: isoDate   
       })
     });
-
+    
     if (entryRes.status === 401) continue;
     if (!entryRes.ok) continue;
 
-    const entryData = await entryRes.json();
-    if (!entryData.goals || entryData.goals.length === 0) continue;
+    let content = null;
+    let prompt = null;
 
-    const content = entryData.goals[0].content;
+    const entryData = await entryRes.json();
+    if (entryData.entry) {
+        content = entryData.entry.content;
+        prompt = entryData.entry.prompt;
+    }
+
+    if (entryData.goals && entryData.goals.length > 0) {
+        content = entryData.goals[0].content;
+    }
 
     const key = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
 
+    if (!content) continue;
 
-    map[key] = content;
+    map[key] = { content, prompt };
   }
 
   return map;
@@ -111,14 +119,14 @@ function markJournalDays(year, month) {
     const entry = entries[key];
 
     if (entry) {
-      const preview = entry.slice(0, 50);
+      const preview = entry.content.slice(0, 50);
       cell.classList.add("has-entry");
       cell.innerHTML = `
         <div class="day-number">${day}</div>
         <div class="day-preview">${preview}</div>
       `;
       cell.addEventListener("click", () => {
-        openJournalModal(key, entry);
+        openJournalModal(key, entry.content, entry.prompt);
       });
     }
   });
@@ -126,12 +134,17 @@ function markJournalDays(year, month) {
 
 
 
-function openJournalModal(dateKey, fullText) {
+
+
+function openJournalModal(dateKey, fullText, promptText) {
   document.getElementById("modalDate").textContent = dateKey;
   document.getElementById("modalText").textContent = fullText;
+  document.getElementById("modalPrompt").textContent = promptText || "";
 
   document.getElementById("journalModal").style.display = "block";
 }
+
+
 
 document.getElementById("closeModal").addEventListener("click", () => {
   document.getElementById("journalModal").style.display = "none";

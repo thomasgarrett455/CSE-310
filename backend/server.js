@@ -296,18 +296,32 @@ app.post('/get_journal_entry', async (req, res) => {
         }
 
         const [rows] = await pool.query(
-            `SELECT journals.content
-             FROM journals
-             JOIN users
-             ON journals.users_id = users.users_id
-             WHERE users.username = ?
-             AND date = ?`,
-            [username, date],
+            `SELECT 
+                journals.content,
+                journals.prompts_id,
+                prompts.prompt
+            FROM journals
+            JOIN users ON journals.users_id = users.users_id
+            JOIN prompts ON journals.prompts_id = prompts.prompts_id
+            WHERE users.username = ?
+            AND journals.date = ?`,
+            [username, date]
         );
+
+
+
+
+
         if (!Array.isArray(rows) || rows.length === 0 ) {
             return res.status(200).json({ goals: [] });
         }
-        return res.status(200).json({ goals: rows });
+        return res.status(200).json({
+            entry: {
+                content: rows[0].content,
+                prompts_id: rows[0].prompts_id,
+                prompt: rows[0].prompt
+            }
+        });
     } catch (error) {
         console.error("Error fetching journal entries", error)
         res.status(500).json({ error: "could not fetch journal entries"})

@@ -6,7 +6,7 @@
     <title>Calander</title>
     <link rel="stylesheet" href="styles/main.css">
     <script src="scripts/darkmode.js" type="module" defer></script>
-    <script type="module" src="scripts/main.js" defer></script>
+    <!-- <script type="module" src="scripts/main.js" defer></script> -->
     <script type="module" src="scripts/logout.js" defer></script>
     <link rel="stylesheet" href="styles/main.css" />
     <script>
@@ -57,9 +57,15 @@
         </section>
         <div id="journalModal" class="modal">
             <div class="modal-content">
-                <span id="closeModal" class="close">&times;</span>
-                <h2 id="modalDate"></h2>
-                <p id="modalText"></p>
+
+                <div class="modal-header">
+                    <h2 id="modalDate"></h2>
+                    <button id="closeModal" class="close-btn">✕</button>
+                </div>
+
+                <h3 id="modalPrompt" class="modal-prompt"></h3>
+                <div id="modalText"></div>
+
             </div>
         </div>
     </main>
