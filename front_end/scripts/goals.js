@@ -4,7 +4,7 @@ import { getUsername } from "./auth.js";
 async function loadGoals() {
     const username = await getUsername();
     
-    const response = await fetch("http://localhost:3000/goals_full", {
+    const response = await fetch("/api/goals_full", {
         method: "POST",
         credentials: "include",
         headers: {"Content-Type": "application/json"}, 
@@ -79,7 +79,7 @@ function renderGoals(goals) {
             
             try {
                 const username = await getUsername();
-                const response = await fetch("http://localhost:3000/update_goal_status", {
+                const response = await fetch("/api/update_goal_status", {
                     method: "POST",
                     credentials: "include",
                     headers: {"Content-Type": "application/json"},

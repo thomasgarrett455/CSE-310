@@ -3,7 +3,7 @@ import { getUsername } from "./auth.js";
 let entries = {};
 
 async function LoadJournalMap(username) {
-  const dateRes = await fetch("http://localhost:3000/get_journal_entry_dates", {
+  const dateRes = await fetch("/api/get_journal_entry_dates", {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -31,7 +31,7 @@ async function LoadJournalMap(username) {
     const d = new Date(date);  
     const isoDate = date.split('T')[0]; 
     
-    const entryRes = await fetch("http://localhost:3000/get_journal_entry", {
+    const entryRes = await fetch("/api/get_journal_entry", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
