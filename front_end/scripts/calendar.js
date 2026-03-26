@@ -17,7 +17,7 @@ async function LoadJournalMap(username) {
   for (const rawDate of dates) {
     // 1. Manually extract the numbers from the string
     const [year, month, day] = rawDate.split('T')[0].split('-').map(Number);
-    const key = `${month}/${day + 1}/${year}`;
+    const key = `${month}/${day}/${year}`;
     
     console.log(`DB String: ${rawDate} | Generated Key: ${key}`); // <-- WATCH THIS IN CONSOLE
 
