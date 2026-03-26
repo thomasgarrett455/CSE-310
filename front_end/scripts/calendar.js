@@ -23,7 +23,7 @@ async function LoadJournalMap(username) {
 
     const isoDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     
-    const entryRes = await fetch("/api/get_journal_entry", {
+    const entryRes = await fetch("/api/get_journal_entry_dates", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
