@@ -18,8 +18,6 @@ async function LoadJournalMap(username) {
     // 1. Manually extract the numbers from the string
     const [year, month, day] = rawDate.split('T')[0].split('-').map(Number);
     const key = `${month}/${day}/${year}`;
-    
-    console.log(`DB String: ${rawDate} | Generated Key: ${key}`); // <-- WATCH THIS IN CONSOLE
 
     const isoDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     
@@ -27,7 +25,7 @@ async function LoadJournalMap(username) {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, date: isoDate })
+      body: JSON.stringify({ username })
     });
 
     if (!entryRes.ok) continue;
