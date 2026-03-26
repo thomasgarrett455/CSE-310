@@ -3,30 +3,21 @@ import { getUsername } from "./auth.js";
 let entries = {};
 
 async function LoadJournalMap(username) {
-  const dateRes = await fetch("/api/get_journal_entry_dates", {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username })
-  });
-
-  if (!dateRes.ok) {
-    console.error("Failed to load dates", dateRes.status);
-    return {};
-  }
+  // ... (keep your fetch logic at the top)
 
   const dateData = await dateRes.json();
   const dates = dateData.goals.map(row => row.date);
   const map = {};
 
   for (const rawDate of dates) {
-    // 1. Manually parse "2026-03-26" to avoid UTC/Local shifting
+    // 1. Parse the string manually to ignore the "Z" and the timezone
+    // This turns "2026-03-26T00:00:00.000Z" into [2026, 03, 26]
     const [year, month, day] = rawDate.split('T')[0].split('-').map(Number);
     
-    // 2. This key format MUST match exactly what markJournalDays() looks for
+    // 2. Build the key using literal numbers (3/26/2026)
     const key = `${month}/${day}/${year}`;
     
-    // 3. Re-format for the API call to ensure it's clean (YYYY-MM-DD)
+    // 3. Keep the ISO date for your API call
     const isoDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     
     const entryRes = await fetch("/api/get_journal_entry", {
@@ -45,13 +36,11 @@ async function LoadJournalMap(username) {
     if (entryData.entry) {
         content = entryData.entry.content;
         prompt = entryData.entry.prompt;
-    } else if (entryData.goals && entryData.goals.length > 0) {
-        content = entryData.goals[0].content;
     }
 
     if (!content) continue;
 
-    // Save to our map using the formatted key (e.g., "3/26/2026")
+    // IMPORTANT: Make sure there is NO OTHER 'key =' assignment below this!
     map[key] = { content, prompt };
   }
 
