@@ -49,8 +49,8 @@ function renderGoals(goals) {
 
         const parseLocalDate = (dateStr) => new Date(dateStr.split("T")[0] + "T00:00:00");
         const dateCreated = parseLocalDate(goal.created_at).toLocaleDateString();
-        
-        const dateComplete = goal.completed_at ? new Date(goal.completed_at).toLocaleDateString() : "";
+
+        const dateComplete = goal.completed_by ? new Date(goal.completed_by).toLocaleDateString() : "";
         
         card.querySelector(".goalName").textContent = goal.name;
         card.querySelector(".dateCreated").textContent = dateCreated;
