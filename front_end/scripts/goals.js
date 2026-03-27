@@ -46,8 +46,10 @@ function renderGoals(goals) {
         card.classList.remove("goalsTemplate");
         card.classList.add("goals");
         card.style.display = "grid";
+
+        const parseLocalDate = (dateStr) => new Date(dateStr.split("T")[0] + "T00:00:00");
+        const dateCreated = parseLocalDate(goal.created_at).toLocaleDateString();
         
-        const dateCreated = new Date(goal.created_at).toLocaleDateString();
         const dateComplete = goal.completed_at ? new Date(goal.completed_at).toLocaleDateString() : "";
         
         card.querySelector(".goalName").textContent = goal.name;
@@ -57,7 +59,7 @@ function renderGoals(goals) {
         
         const checkButton = card.querySelector(".checked");
 
-        // Restore checked state from DB on page load
+        // Restore checked state from DB on page load 
         if (goal.status === 1) {
             checkButton.checked = true;
         }
