@@ -79,7 +79,7 @@ input[type="password"] {
     padding: 0.6rem;
     border-radius: 6px;
     border: 2px solid var(--main-color);
-    background: white;
+    background: var(--main-color);
     font-size: 1rem;
     color: var(--fourth-color);
     justify-self: center;

@@ -30,6 +30,11 @@
         min-height: 150px;
         display: grid;
         grid-template-columns: 9fr 1fr;
+        color: var(--fourth-color);
+    }
+    #prompt-text {
+        margin-left: 1%;
+        font-size: 1.3rem;
     }
 
     #currGoals {
