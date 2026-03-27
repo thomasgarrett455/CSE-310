@@ -11,28 +11,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const saveGoalBtn = document.getElementById("submit-goal"); 
     const goalInput = document.getElementById("goal-creation");
     const logoutBtn = document.getElementById("logout-btn");
-    // if (logoutBtn) {
-    //     logoutBtn.addEventListener("click", async () => {
-    //         try {
-    //             // backend to destroy the session cookie
-    //             const res = await fetch("http://localhost:3000/logout", {
-    //                 method: "POST",
-    //                 credentials: "include", 
-    //                 headers: { "Content-Type": "application/json" }
-    //             });
-
-    //             //  redirect to the login page
-    //             if (res.ok) {
-    //                 window.location.href = "index.html";
-    //             } else {
-    //                 console.error("Server failed to log out.");
-    //                 alert("Trouble logging out. Please try again.");
-    //             }
-    //         } catch (err) {
-    //             console.error("Network error during logout:", err);
-    //         }
-    //     });
-    // }
 
     saveGoalBtn.addEventListener("click", async () => {
     const content = goalInput.value.trim();
@@ -45,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    const res = await fetch("http://localhost:3000/add_goal", {
+    const res = await fetch("/api/add_goal", {
         method: "POST", 
         credentials: "include", 
         headers: { "Content-Type": 'application/json'},
@@ -78,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function saveJournal(username, journalEntry) {
     try {
         const prompts_id = getPromptId()
-        const res = await fetch("http://localhost:3000/journal_entry", {
+        const res = await fetch("/api/journal_entry", {
             method: "POST", 
             credentials: "include", 
             headers: { "Content-Type": "application/json"},
@@ -106,7 +84,7 @@ function getPromptId() {
 
 async function loadCurrentGoals(username) {
     try {
-        const res = await fetch("http://localhost:3000/name_current_goals", {
+        const res = await fetch("/api/name_current_goals", {
             method: "POST", 
             credentials: "include",
             headers: { "Content-Type": "application/json"},
@@ -148,7 +126,7 @@ let promptIndex = 0
 
 async function loadCurrentPrompt() {
     try {
-        const res = await fetch("http://localhost:3000/journal_prompts", {
+        const res = await fetch("/api/journal_prompts", {
             method: "POST",
             credentials: "include", 
             headers: { "Content-Type": "application/json"},

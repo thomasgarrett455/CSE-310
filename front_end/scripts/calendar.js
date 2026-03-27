@@ -3,70 +3,41 @@ import { getUsername } from "./auth.js";
 let entries = {};
 
 async function LoadJournalMap(username) {
-  const dateRes = await fetch("http://localhost:3000/get_journal_entry_dates", {
+  const dateRes = await fetch("/api/get_journal_entry_dates", {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username })
   });
-  
-  if (dateRes.status === 401) {
-    console.warn("User has no journal entries yet.");
-    return {};
-  }
-  
-  if (!dateRes.ok) {
-    console.error("Failed to load dates", dateRes.status);
-    return {};
-  }
-  
+
   const dateData = await dateRes.json();
   const dates = dateData.goals.map(row => row.date);
-  console.log("LoadJournalMap starting", dates);
-
   const map = {};
 
-  for (const date of dates) {
+  for (const rawDate of dates) {
+    const [year, month, day] = rawDate.split('T')[0].split('-').map(Number);
+    const key = `${month}/${day}/${year}`;
+    const isoDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-    const d = new Date(date);  
-    const isoDate = date.split('T')[0]; 
-    
-    const entryRes = await fetch("http://localhost:3000/get_journal_entry", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username,
-        date: isoDate   
-      })
+    const entryRes = await fetch("/api/get_journal_entry", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, date: isoDate })
     });
-    
-    if (entryRes.status === 401) continue;
+
     if (!entryRes.ok) continue;
-
-    let content = null;
-    let prompt = null;
-
     const entryData = await entryRes.json();
-    if (entryData.entry) {
-        content = entryData.entry.content;
-        prompt = entryData.entry.prompt;
+
+    const content = entryData.entry?.content;
+    const prompt = entryData.entry?.prompt || "";
+
+    if (content) {
+        map[key] = { content, prompt };
     }
-
-    if (entryData.goals && entryData.goals.length > 0) {
-        content = entryData.goals[0].content;
-    }
-
-    const key = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
-
-    if (!content) continue;
-
-    map[key] = { content, prompt };
-  }
-
-  return map;
 }
-
+return map;
+}
 
 
 // Calendar logic code

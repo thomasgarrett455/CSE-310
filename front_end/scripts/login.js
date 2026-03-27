@@ -32,8 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const endpoint =
             mode === "login"
-                ? "http://localhost:3000/login"
-                : "http://localhost:3000/register";
+                ? "/api/login"
+                : "/api/register";
 
         try {
             const response = await fetch(endpoint, {
