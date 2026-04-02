@@ -1,32 +1,37 @@
 AI Journal APP
 ## Team Members
-Thomas Garrett, Daniel Wahlquist, Cam Woodward, Jack Murdock
+Thomas Garrett, Daniel Wahlquist, Cam Woodward
 ## Software Description
-A journaling application that uses a html,css,js front end and c# with a sql database to store journal entries and goals. (Update: We have since transitioned to only using JS rather than C#.)
+A web journaling app (“The Daily Entry”): users register and log in, see AI-generated daily prompts, write journal entries, and manage personal goals. The UI is static HTML, CSS, and JavaScript under `front_end/`. The API is a Node.js (Express) server under `backend/` that uses a MySQL database for users, journal entries, goals, and stored prompts. Daily prompts are generated with the OpenAI API and written to the database on a schedule.
 
 ## Architecture
 Programming Languages	
-* JavaScript
+* JavaScript (Node.js backend and browser)
 * HTML, CSS
-* ~~C#~~ 
 
-Frameworks	
-* ASP.NET Core
+Frameworks & major libraries	
+* **Express** — HTTP API and sessions
+* **mysql2** — MySQL connection pool
+* **argon2** — password hashing
+* **express-session** — cookie-based sessions
+* **OpenAI** (Node SDK) — journal prompt generation (`gpt-4o`)
+* **node-cron** — nightly job for new prompts
+* **dotenv** — configuration from environment variables
 
 Data Storage	
-* SQLite (SQL Relational)
-
-Containerization Tool
-* Docker
+* **MySQL** — tables include `users`, `journals`, `goals`, `prompts` (and related keys as used by the API)
 
 Development Tools	
 * Visual Studio Code
-* GitHub (required) - Project & Public Repository
+* GitHub (required) — project and public repository
+* Node.js — run the backend (`backend/server.js` listens on port **3000**)
+
+**Configuration:** Create a `.env` in `backend/` (see `.gitignore`) with database settings (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_PORT`, `DB_CONNECTIONS`), `SESSION_SECRET`, and `OPENAI_API_KEY`. The server enables CORS for `http://localhost:5500` for local frontend development; the frontend calls routes under `/api/...`—use a dev server/proxy that maps those requests to the Express app if your setup requires it.
 
 ## Software Features
-* [ ] AI to create journal entry prompt
-* [ ] Robust database to store entries and user data
-* [ ] front end html, css and javascript to connect to backend, including dynamic calendar generation with interactive journal entry panels, and goal list rendering onto cards for users to easily track goals, auto saving for entries onto local storage before sending them to the backend.
+* [x] AI-generated journal prompts (OpenAI, stored in MySQL; nightly job; rotate prompts on the journal page)
+* [x] MySQL persistence for users, entries, goals, and prompts
+* [x] Frontend: login/register, session-aware pages, journal home with prompts and goal list, calendar with month navigation and entry previews/modal, goals page with cards and complete/incomplete status, dark mode (theme in `localStorage`), logout
 
 ## Team Communication
 Text Message
@@ -34,11 +39,11 @@ Text Message
 
 |Responsibility                      |Team Member(s)              |
 |------------------------------------|----------------------------|
-|Conducting Meetings                 |Jack Murdock                |
+|Conducting Meetings                 |Thomas Garrett              |
 |Maintaining Team Assignment List    |Thomas Garrett              |
-|Ensuring GitHub is Working          |Daniel Walhquist            |
+|Ensuring GitHub is Working          |Daniel Wahlquist            |
 |Maintaining Documentation           |Cam Woodward                |
-|Create & Display Presentations      |Jack Murdock                |
+|Create & Display Presentations      |Daniel Wahlquist            |
 |Submit Team Assignments             |Thomas Garrett              |
 
 ## Reflections
