@@ -47,3 +47,25 @@ Text Message
 |Submit Team Assignments             |Thomas Garrett              |
 
 ## Reflections
+
+# What the team Learned?
+* Github Team Management
+* How to work together using GitHub and communication techniques
+* Github workflows!! I.e. creating branches, using pull requests, rebasing
+* Using comments is important so others can easily scan code and understand what it’s meant to do
+* Better code organization, and future prepping with modularity
+# What can be Improved?
+* Evening out the work that each teammate has so everyone can have equal amount of work
+* Planning needs to be improved. At times we had little direction even though there was lots to do
+* Team responsibility, with one of our team members not really doing much to help the project, that we eventually kicked out, but things may have gone smoother, if we had either, kicked him out earlier, or held him more accountable for his things
+# Future Plans for this Project?
+* Editing the journal
+* History of editing
+* Using email for registering users
+* Ability to change password
+* Integrating cloudflare to ensure users are human
+* User profile page
+* Add journals for past days
+
+
+
